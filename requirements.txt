@@ -1,0 +1,4 @@
+Django
+google-ai-generativelanguage
+google-generativeai
+PyMuPDF

@@ -1,0 +1,22 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial</title>
+</head>
+<body>
+    <h1>Envie um PDF para Processamento</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="pdf_file">Escolha um PDF:</label>
+        <input type="file" id="pdf_file" name="pdf_file" accept="application/pdf" required>
+        <button type="submit">Enviar PDF</button>
+    </form>
+
+    {% if response_data %}
+        <h2>Resposta da API:</h2>
+        <p>{{ response_data }}</p>
+    {% endif %}
+</body>
+</html>
