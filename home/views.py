@@ -4,7 +4,7 @@ import fitz
 import os
 import json
 
-with open('key.json', 'f') as f:
+with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
 
 genai.configure(api_key=google_api_key)
