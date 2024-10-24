@@ -1,0 +1,81 @@
+name: "🐛 Relatório de Bug"
+description: Crie um novo ticket para um bug.
+title: "🐛 [BUG] - <título>"
+labels: [
+  "bug"
+]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descrição"
+      description: Por favor, insira uma descrição explícita do seu problema
+      placeholder: Descrição curta e explícita do seu incidente...
+    validations:
+      required: true
+  - type: input
+    id: reprod-url
+    attributes:
+      label: "URL de Reprodução"
+      description: Por favor, insira a URL do GitHub para fornecer uma reprodução do problema
+      placeholder: ex. https://github.com/USUARIO/NOME-DO-REPOSITORIO
+    validations:
+      required: true
+  - type: textarea
+    id: reprod
+    attributes:
+      label: "Passos para Reproduzir"
+      description: Por favor, insira uma descrição explícita do seu problema
+      value: |
+        1. Vá para '...'
+        2. Clique em '....'
+        3. Role para baixo até '....'
+        4. Veja o erro
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Capturas de Tela"
+      description: Se aplicável, adicione capturas de tela para ajudar a explicar o seu problema.
+      value: |
+        ![DESCRIÇÃO](LINK.png)
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs"
+      description: Por favor, copie e cole qualquer saída de log relevante. Isso será formatado automaticamente como código, então não há necessidade de usar crases.
+      render: bash
+    validations:
+      required: false
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: "Navegadores"
+      description: Em quais navegadores você está vendo o problema?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Opera
+    validations:
+      required: false
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Sistema Operacional"
+      description: Qual é o ambiente impactado?
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - Mac
+    validations:
+      required: false
+
