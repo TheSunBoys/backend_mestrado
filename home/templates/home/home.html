@@ -7,10 +7,14 @@
 <body>
     <h1>Envie um PDF para Processamento</h1>
     
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px; width: 300px;">
         {% csrf_token %}
+        <label for="estudante">Nome do Aluno:</label>
+        <input type="text" id="estudante" name="estudante" required>
+
         <label for="pdf_file">Escolha um PDF:</label>
         <input type="file" id="pdf_file" name="pdf_file" accept="application/pdf" required>
+        
         <button type="submit">Enviar PDF</button>
     </form>
 
