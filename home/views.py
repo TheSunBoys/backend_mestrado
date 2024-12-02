@@ -4,7 +4,7 @@ import fitz
 import os
 import json
 import re
-
+import json 
 
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
@@ -22,20 +22,26 @@ def home(request):
 def armazenar_arquivos(request):
     if request.method == 'POST' and request.FILES.get('pdf_file'):
         pdf_file = request.FILES['pdf_file']
-        nome_aluno = request.POST.get("estudante")
+        nome_aluno = request.POST.get("nome")
         print("Arquivo PDF recebido:", pdf_file)
         
         output_dir = f'output_images/{nome_aluno}'.strip()
         
         os.makedirs(output_dir, exist_ok=True)
-
+        
         pdf_path = os.path.join(output_dir, f'{pdf_file}') 
         pdf_content = pdf_file.read() 
         with open(pdf_path, 'wb') as f:
             f.write(pdf_content )
         print(f"PDF completo salvo como {pdf_path}")
 
+        dados_pessoais = {
+            "nome": nome_aluno
+        }
 
+        with open("output_images/{nome_aluno}/dados_pessoais.json", "w", encoding="utf-8") as arquivo_json:
+            json.dump(dados_pessoais, arquivo_json, indent=4, ensure_ascii=False)
+            
 def verificador_de_documento(request):
     response_data = None 
     fotos = [] 
