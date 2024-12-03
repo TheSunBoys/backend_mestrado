@@ -1,0 +1,137 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #0d0d6b, #1c1cf0);
+}
+
+.signup-container {
+    background-color: #f2f2f2;
+    padding: 30px;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.signup-container h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.signup-container input[type="text"],
+.signup-container input[type="email"],
+.signup-container input[type="date"],
+.signup-container select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.email-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.email-container input[type="email"] {
+    flex-grow: 1;
+}
+
+.email-container .validate-email {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.email-container .validate-email:hover {
+    background-color: #0056b3;
+}
+
+.signup-container .input-group {
+    text-align: left;
+    margin: 10px 0;
+}
+
+.signup-container label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.document-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.document-container label {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+}
+
+.document-container input[type="file"] {
+    flex: 2;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.document-container .upload-btn {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.document-container .upload-btn:hover {
+    background-color: #0056b3;
+}
+
+.signup-container button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.signup-container button[type="submit"]:hover {
+    background-color: #0056b3;
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de candidatura</title>
+    <link rel="stylesheet" href="formulario1.css">
+</head>
+<body>
+    <div class="signup-container">
+        <h2>CADASTRO</h2>
+        <form action="#" method="POST" enctype="multipart/form-data">
+            <input type="text" name="nome-completo" placeholder="Nome completo" required>
+            
+            <div class="email-container">
+                <input type="email" name="email" placeholder="E-mail" required>
+                <button type="button" class="validate-email">VALIDAR E-MAIL</button>
+            </div>
+
+            <div class="input-group">
+                <label for="genero">Gênero:</label>
+                <select name="genero" id="genero" required>
+                    <option value="">Selecione</option>
+                    <option value="homem">Homem</option>
+                    <option value="mulher">Mulher</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="ppi">Você se considera PPI?</label>
+                <select name="ppi" id="ppi" required>
+                    <option value="">Selecione</option>
+                    <option value="preto">Preto</option>
+                    <option value="pardo">Pardo</option>
+                    <option value="indigena">Indígena</option>
+                    <option value="nao">Não</option>
+                </select>
+            </div>
+
+            <div class="document-container">
+                <label>Anexa documento com RG:</label>
+                <input type="file" name="documento-rg" accept=".pdf,.jpg,.png" required>
+                <button type="button" class="upload-btn">ENVIAR</button>
+            </div>
+
+            <div class="document-container">
+                <label>Anexa documento com CPF:</label>
+                <input type="file" name="documento-cpf" accept=".pdf,.jpg,.png" required>
+                <button type="button" class="upload-btn">ENVIAR</button>
+            </div>
+
+            <div class="document-container">
+                <label>Anexa documento com Diploma:</label>
+                <input type="file" name="documento-diploma" accept=".pdf,.jpg,.png" required>
+                <button type="button" class="upload-btn">ENVIAR</button>
+            </div>
+
+            <button type="submit">AVANÇAR</button>
+        </form>
+    </div>
+</body>
+</html>
