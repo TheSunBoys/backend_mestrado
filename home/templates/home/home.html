@@ -1,36 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Inicial</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela de Home</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'TelaHome/home.css' %}">
+
 </head>
 <body>
-    <h1>Envie um PDF para Processamento</h1>
-    
-    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px; width: 300px;">
-        {% csrf_token %}
-        <label for="nome">Nome do Aluno:</label>
-        <input type="text" id="nome" name="nome" required>
-        
-        <label for="idade">Idade:</label>
-        <input type="text" id="idade" name="idade" required>
+  
+  <header>
+    <nav>
+      <ul>
+        <li><a href="#">HOME</a></li>
+        <li><a href="#">EDITAIS</a></li>
+        <li><a href="#">NOTÍCIAS</a></li>
+        <li><a href="#">SOBRE NÓS</a></li>
+        <li><a href="#">PERFIL</a></li>
+      </ul>
+    </nav>
+  </header>
 
-        <label for="curso">Curso:</label>
-        <input type="text" id="curso" name="curso" required>
+ 
+  <section class="carousel">
+    <div class="slide">
+      <img src="#" alt="Imagem 1">
+      <div class="content">
+        <h2>TÍTULO</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      </div>
+    </div>
+    <button class="prev">&lt;</button>
+    <button class="next">&gt;</button>
+  </section>
 
-        <label for="IRA">IRA:</label>
-        <input type="text" id="IRA" name="IRA" required>
+ 
+  <section class="cta">
+    <button href="./pages/cadastro/">Inscrever no processo seletivo</button>
+  </section>
 
-        <label for="Email">Email Academico:</label>
-        <input type="text" id="Email" name="Email" required>
+  
+  <section class="news">
+    <h2>Notícias em Destaque</h2>
+    <div class="news-item">
+      <img src="../../assets/images/news1.jpg" alt="Notícia 1">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </div>
+    <div class="news-item">
+      <img src="../../assets/images/news2.jpg" alt="Notícia 2">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </div>
+    <div class="news-item">
+      <img src="../../assets/images/news3.jpg" alt="Notícia 3">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </div>
+  </section>
 
-        <label for="pdf_file">Escolha um PDF:</label>
-        <input type="file" id="pdf_file" name="pdf_file" accept="application/pdf" required>
-        
-        <button type="submit">Enviar PDF</button>
-    </form>
+  
+  <footer>
+    <ul>
+      <li><a href="#">Início</a></li>
+      <li><a href="#">Serviços</a></li>
+      <li><a href="#">Sobre Nós</a></li>
+      <li><a href="#">Contatos</a></li>
+    </ul>
+    <p>© 2024 Todos os direitos reservados.</p>
+  </footer>
 
-    
+  <script src="./script.js"></script>
 </body>
 </html>

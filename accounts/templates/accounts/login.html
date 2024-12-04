@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'TelaLogin/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>LOGIN</h2>
+        <form method="post">
+            {% csrf_token %}
+            <!-- Campo de Usuário -->
+            <input type="text" name="username" placeholder="Usuário" required>
+            <!-- Campo de Senha -->
+            <input type="password" name="password" placeholder="Senha" required>
+            <!-- Link para Registro -->
+            <a href="{% url 'register' %}">Não tem conta? Crie uma agora.</a>
+            <!-- Botão de Login -->
+            <button type="submit">ENTRAR</button>
+        </form>
+    </div>
+</body>
+</html>
