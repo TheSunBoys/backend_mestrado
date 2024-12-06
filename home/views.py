@@ -14,10 +14,12 @@ genai.configure(api_key=google_api_key)
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
 def home(request):
+    return render(request, 'home/home.html')
+
+def envio_de_arquivo(request):
     response_data = "penis"
     armazenar_arquivos(request)
-
-    return render(request, 'home/home.html', {'response_data': response_data})
+    return render(request, 'home/inscricao.html',{'reponse_data': response_data})
 
 def armazenar_arquivos(request):
     if request.method == 'POST' and request.FILES.get('pdf_file'):

@@ -3,11 +3,13 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 
 class UserRegistrationForm(UserCreationForm):
-    role = forms.ChoiceField(choices=User.ROLE_CHOICES, required=True, label="Tipo de Usuário")
+    cpf = forms.CharField(max_length=11, required=True)
+    date_of_birth = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date'}))
+    role = forms.ChoiceField(choices=User.ROLE_CHOICES, required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'role', 'password1', 'password2']
+        fields = ['username', 'email', 'cpf', 'date_of_birth', 'role', 'password1', 'password2']
 
 class UserLoginForm(AuthenticationForm):
     class Meta:

@@ -7,10 +7,13 @@ def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')  # Redireciona após o registro
+            form.save()
+            print("tudo OK")
+            return redirect('login') 
+        else:
+            print("erro ao salvar")
     else:
+        print("algo diferente")
         form = UserRegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
@@ -20,7 +23,10 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('')  
+            print("login aceito")
+            return redirect('home')  
+        else:
+            print("sem sucesso")
     else:
         form = UserLoginForm()
     return render(request, 'accounts/login.html', {'form': form})

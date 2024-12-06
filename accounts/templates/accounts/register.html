@@ -3,30 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro</title>
+    <title>Registrar</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'TelaCadastro/cadastro.css' %}">
 </head>
 <body>
     <div class="signup-container">
-        <h2>CADASTRO</h2>
-        <form method="post" enctype="multipart/form-data">
+        <h2>Cadastro</h2>
+        <form method="post">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Nome completo" required>
-            <input type="text" name="cpf" placeholder="CPF" required>
-            <input type="date" name="birth_date" placeholder="Data de nascimento" required>
-            <input type="email" name="email" placeholder="E-mail" required>
-            <input type="password" name="password1" placeholder="Crie uma senha" required>
-            <input type="password" name="password2" placeholder="Confirme uma senha" required>
-            
-            <!-- Role Selector -->
-            <select name="role" required>
-                <option value="teacher">Professor</option>
-                <option value="student">Aluno</option>
-            </select>
-            
-            <input type="file" name="profile_picture">
-            <button type="submit">CADASTRAR</button>
+            {{ form.as_p }}
+            <button type="submit">Registrar</button>
         </form>
     </div>
 </body>
