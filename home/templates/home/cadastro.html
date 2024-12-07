@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aluno</title>
+    <script>
+        // Função para adicionar um novo campo de upload
+        function adicionarCampo() {
+            const container = document.getElementById('arquivos-container');
+            const novoCampo = document.createElement('div');
+            novoCampo.classList.add('arquivo-campo');
+
+            // Campo para o tipo do arquivo
+            const tipoLabel = document.createElement('label');
+            tipoLabel.innerText = 'Tipo de Arquivo:';
+            const tipoSelect = document.createElement('select');
+            tipoSelect.name = 'tipo[]';
+            tipoSelect.required = true;
+            tipoSelect.innerHTML = `
+                <option value="">Selecione</option>
+                <option value="curriculo">Currículo</option>
+                <option value="projeto">Projeto</option>
+                <option value="documento_pessoal">Documento Pessoal</option>
+            `;
+
+            // Campo para o arquivo
+            const arquivoLabel = document.createElement('label');
+            arquivoLabel.innerText = 'Arquivo:';
+            const arquivoInput = document.createElement('input');
+            arquivoInput.type = 'file';
+            arquivoInput.name = 'arquivos[]';
+            arquivoInput.accept = '.pdf';
+            arquivoInput.required = true;
+
+            // Adicionando os elementos ao novo campo
+            novoCampo.appendChild(tipoLabel);
+            novoCampo.appendChild(tipoSelect);
+            novoCampo.appendChild(arquivoLabel);
+            novoCampo.appendChild(arquivoInput);
+
+            // Adicionando o novo campo ao container
+            container.appendChild(novoCampo);
+        }
+    </script>
+</head>
+<body>
+    <h1>Cadastro de Aluno para Mestrado</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ aluno_form.as_p }}
+
+        <h3>Arquivos</h3>
+        <div id="arquivos-container">
+            <!-- Campo inicial de upload -->
+            <div class="arquivo-campo">
+                <label for="tipo-0">Tipo de Arquivo:</label>
+                <select name="tipo[]" id="tipo-0" required>
+                    <option value="">Selecione</option>
+                    <option value="curriculo">Currículo</option>
+                    <option value="projeto">Projeto</option>
+                    <option value="documento_pessoal">Documento Pessoal</option>
+                </select>
+
+                <label for="arquivo-0">Arquivo:</label>
+                <input type="file" name="arquivos[]" id="arquivo-0" accept=".pdf" required>
+            </div>
+        </div>
+
+        <!-- Botão para adicionar mais campos -->
+        <button type="button" onclick="adicionarCampo()">Adicionar outro arquivo</button>
+
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>

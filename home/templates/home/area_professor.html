@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Professor</title>
+</head>
+<body>
+    <h1>Alunos Inscritos</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Curso</th>
+                <th>Arquivo(s)</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aluno in alunos %}
+                <tr>
+                    <td>{{ aluno.nome }}</td>
+                    <td>{{ aluno.curso }}</td>
+                    <td>
+                        {% for arquivo in aluno.arquivos.all %}
+                            <a href="{{ arquivo.arquivo.url }}" download>{{ arquivo.tipo }}</a><br>
+                        {% empty %}
+                            Nenhum arquivo disponível.
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <!-- Link para excluir o aluno -->
+                        <a href="{% url 'deletar_aluno' aluno.id %}" onclick="return confirm('Tem certeza que deseja excluir este aluno?')">Excluir</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Nenhum aluno inscrito.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

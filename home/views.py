@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 import google.generativeai as genai
 import fitz  
 import os
-import json
 import re
-import json 
-
+from django.http import JsonResponse
+from .forms import AlunoForm, ArquivoForm
+from .models import Aluno, Arquivo
+import json
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
 
@@ -16,34 +18,69 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 def home(request):
     return render(request, 'home/home.html')
 
-def envio_de_arquivo(request):
-    response_data = "penis"
-    armazenar_arquivos(request)
-    return render(request, 'home/inscricao.html',{'reponse_data': response_data})
+def cadastro_aluno(request):
+    if request.method == 'POST':
+        aluno_form = AlunoForm(request.POST)
 
-def armazenar_arquivos(request):
-    if request.method == 'POST' and request.FILES.get('pdf_file'):
-        pdf_file = request.FILES['pdf_file']
-        nome_aluno = request.POST.get("nome")
-        print("Arquivo PDF recebido:", pdf_file)
-        
-        output_dir = f'output_images/{nome_aluno}'.strip()
-        
-        os.makedirs(output_dir, exist_ok=True)
-        
-        pdf_path = os.path.join(output_dir, f'{pdf_file}') 
-        pdf_content = pdf_file.read() 
-        with open(pdf_path, 'wb') as f:
-            f.write(pdf_content )
-        print(f"PDF completo salvo como {pdf_path}")
+        if aluno_form.is_valid():
+            aluno = aluno_form.save()
 
-        dados_pessoais = {
-            "nome": nome_aluno
-        }
+            # Processando múltiplos arquivos e tipos
+            arquivos = request.FILES.getlist('arquivos[]')
+            tipos = request.POST.getlist('tipo[]')
 
-        with open("output_images/{nome_aluno}/dados_pessoais.json", "w", encoding="utf-8") as arquivo_json:
-            json.dump(dados_pessoais, arquivo_json, indent=4, ensure_ascii=False)
+            for arquivo, tipo in zip(arquivos, tipos):
+                Arquivo.objects.create(aluno=aluno, tipo=tipo, arquivo=arquivo)
+
+            # Criar o JSON com os dados do aluno e dos arquivos
+            aluno_json = {
+                'nome': aluno.nome,
+                'idade': aluno.idade,
+                'curso': aluno.curso,
+                'ira': aluno.ira,
+                'email': aluno.email,
+                'lattes': aluno.lattes,
+                'github': aluno.github,
+                'interesse': aluno.interesse,
+                'genero': aluno.genero,
+                'ppi': aluno.ppi,
+                'cpf': aluno.cpf,
+                'arquivos': [{'tipo': arq.tipo, 'url': arq.arquivo.url} for arq in aluno.arquivos.all()],
+                'data_cadastro': aluno.data_cadastro.isoformat(),
+            }
             
+            return redirect('home')
+
+    else:
+        aluno_form = AlunoForm()
+
+    return render(request, 'home/cadastro.html', {'aluno_form': aluno_form})
+
+def deletar_aluno(request, aluno_id):
+    # Busca o aluno pelo ID (caso o aluno não exista, retorna erro 404)
+    aluno = get_object_or_404(Aluno, pk=aluno_id)
+
+    if request.method == 'POST':
+        # Excluir os arquivos relacionados ao aluno
+        aluno.arquivos.all().delete()
+        
+        # Excluir o aluno
+        aluno.delete()
+
+        # Exibir mensagem de sucesso
+        messages.success(request, f'Aluno {aluno.nome} deletado com sucesso.')
+
+        # Redirecionar para a página da área do professor
+        return redirect('area_professor')
+
+    return render(request, 'home/confirmar_deletar.html', {'aluno': aluno})
+
+def area_professor(request):
+    # Busca todos os alunos registrados
+    alunos = Aluno.objects.all()
+
+    return render(request, 'home/area_professor.html', {'alunos': alunos})
+
 def verificador_de_documento(request):
     response_data = None 
     fotos = [] 
