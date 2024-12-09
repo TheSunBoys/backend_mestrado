@@ -2,5 +2,5 @@ __pycache__/
 venv/
 .vscode/
 .github/
-output_images/
+alunos/
 key.json
