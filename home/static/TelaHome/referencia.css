@@ -1,0 +1,104 @@
+/* Estilo geral */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa;
+}
+
+h1 {
+    text-align: center;
+    color: #3b3398;
+    font-weight: bold;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+.btn-voltar {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    background-color: #3b3398;
+    color: #fff;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.btn-voltar:hover {
+    background-color: #2a2271;
+}
+
+/* Estilização da tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table thead {
+    background-color: #3b3398;
+    color: #fff;
+    text-align: left;
+}
+
+table thead th {
+    padding: 15px;
+    font-size: 16px;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+table tbody td {
+    padding: 15px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Links para arquivos */
+table tbody td a {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 13px;
+    margin: 2px 0;
+    transition: background-color 0.3s;
+}
+
+table tbody td a:hover {
+    background-color: #0056b3;
+}
+
+/* Mensagem de confirmação */
+button {
+    cursor: pointer;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #b02a37;
+}

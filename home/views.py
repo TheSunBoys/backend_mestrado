@@ -1,9 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 import google.generativeai as genai
-import fitz  
-import os
-import re
 from django.http import JsonResponse, HttpResponse
 from .forms import AlunoForm, ArquivoForm
 from .models import Aluno, Arquivo
