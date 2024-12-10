@@ -102,9 +102,6 @@ def verificador_de_documento(request):
                 print(nome_arquivo)
                 sample_file = extract_text_from_pdf(nome_arquivo)
                 prompt_para_ia.append(sample_file)
-            
-            
-
             prompt_para_ia.insert(0, prompt)    
             response = model.generate_content(prompt_para_ia)  
             analise_resultados.append(response.text)
