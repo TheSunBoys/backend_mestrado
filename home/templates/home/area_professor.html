@@ -31,8 +31,7 @@
                         {% endfor %}
                     </td>
                     
-                    <td>
-                        <!-- Link para excluir o aluno -->
+                    <td>                       
                         <a href="{% url 'deletar_aluno' aluno.id %}" onclick="return confirm('Tem certeza que deseja excluir este aluno?')">Excluir</a>
                     </td>
                 </tr>

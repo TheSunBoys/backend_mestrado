@@ -4,10 +4,12 @@ import google.generativeai as genai
 import fitz  
 import os
 import re
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .forms import AlunoForm, ArquivoForm
 from .models import Aluno, Arquivo
 import json
+import PyPDF2
+
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
 
@@ -76,40 +78,62 @@ def deletar_aluno(request, aluno_id):
     return render(request, 'home/confirmar_deletar.html', {'aluno': aluno})
 
 def area_professor(request):
-    # Busca todos os alunos registrados
     alunos = Aluno.objects.all()
 
     return render(request, 'home/area_professor.html', {'alunos': alunos})
 
 def verificador_de_documento(request):
-    response_data = None 
-    fotos = [] 
+    if request.method == 'POST':
+        body = json.loads(request.body)
 
-    if request.method == 'POST' and request.FILES.get('pdf_file'):
-        pdf_file = request.FILES['pdf_file']
-        print("Arquivo PDF recebido:", pdf_file)
+        analise_resultados = []
 
-        pdf = fitz.open(stream=pdf_file.read(), filetype="pdf")
-        print(f"Número de páginas no PDF: {pdf.page_count}")
-        output_dir = 'output_images'
-        os.makedirs(output_dir, exist_ok=True)
+        for aluno in body:
+            aluno_id = aluno['aluno_id']
+            arquivos = aluno['arquivos'] 
+            print(arquivos)
 
-        for page_num in range(pdf.page_count):
-            page = pdf.load_page(page_num)
-            pix = page.get_pixmap(dpi=300)
-            image_path = os.path.join(output_dir, f'pagina_{page_num + 1}.png')
-            fotos.append(image_path)
-            pix.save(image_path)
-            print(f'Página {page_num + 1} salva como {image_path}')
+            prompt_para_ia = []
+            prompt = "resuma cada um destes arquivos e me retorne um resumo geral sobre o aluno"
 
-        uploaded_files = []
-        for foto in fotos:
-            print(f"Enviando foto: {foto} para a API Generativa")
-            sample_file = genai.upload_file(path=foto, display_name="foto_documento")
-            print(sample_file)
-            uploaded_files.append(sample_file)
+            for arquivo in arquivos:
+                nome_arquivo = arquivo['nome']
+                print(nome_arquivo)
+                sample_file = extract_text_from_pdf(nome_arquivo)
+                prompt_para_ia.append(sample_file)
+            
+            prompt_para_ia.insert(0, prompt)
 
-        response_data = model.generate_content([*uploaded_files, "me retorne um json com os dados deste documento"]).text
+            response = model.generate_content(prompt_para_ia)
+            try:
+                aluno_obj = Aluno.objects.get(pk=aluno_id)
 
-    
-    return render(request, 'home/documento.html', {'response_data': response_data})
+                analise_resultados.append({
+                    'aluno': aluno_obj.nome,
+                    'resumo': response.text
+                })
+            except Aluno.DoesNotExist:
+                analise_resultados.append({
+                    'aluno': f"ID {aluno_id}",
+                    'erro': "Aluno não encontrado"
+                })
+
+        resumos = "\n".join([resultado['resumo'] for resultado in analise_resultados if 'resumo' in resultado])
+
+        # Retorna apenas o texto como resposta
+        return HttpResponse(resumos, content_type="text/plain")
+
+
+    else: 
+        alunos = Aluno.objects.all()
+        return render(request, 'home/avaliar.html', {'alunos': alunos})
+
+def extract_text_from_pdf(pdf_path):
+    with open(pdf_path, 'rb') as pdf_file:
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        extracted_text = ""
+        for page in pdf_reader.pages:
+            text = page.extract_text()
+            if text:
+                extracted_text += text
+        return extracted_text

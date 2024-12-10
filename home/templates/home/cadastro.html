@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Aluno</title>
     <script>
-        // Função para adicionar um novo campo de upload
         function adicionarCampo() {
             const container = document.getElementById('arquivos-container');
             const novoCampo = document.createElement('div');
             novoCampo.classList.add('arquivo-campo');
 
-            // Campo para o tipo do arquivo
             const tipoLabel = document.createElement('label');
             tipoLabel.innerText = 'Tipo de Arquivo:';
             const tipoSelect = document.createElement('select');
@@ -24,7 +22,6 @@
                 <option value="documento_pessoal">Documento Pessoal</option>
             `;
 
-            // Campo para o arquivo
             const arquivoLabel = document.createElement('label');
             arquivoLabel.innerText = 'Arquivo:';
             const arquivoInput = document.createElement('input');
@@ -33,13 +30,11 @@
             arquivoInput.accept = '.pdf';
             arquivoInput.required = true;
 
-            // Adicionando os elementos ao novo campo
             novoCampo.appendChild(tipoLabel);
             novoCampo.appendChild(tipoSelect);
             novoCampo.appendChild(arquivoLabel);
             novoCampo.appendChild(arquivoInput);
 
-            // Adicionando o novo campo ao container
             container.appendChild(novoCampo);
         }
     </script>
@@ -54,7 +49,6 @@
 
         <h3>Arquivos</h3>
         <div id="arquivos-container">
-            <!-- Campo inicial de upload -->
             <div class="arquivo-campo">
                 <label for="tipo-0">Tipo de Arquivo:</label>
                 <select name="tipo[]" id="tipo-0" required>

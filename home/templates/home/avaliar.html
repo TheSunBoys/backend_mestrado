@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load custom_filters %}
+    <title>Seleção de Alunos para Análise</title>
+    <script>
+        function enviarSelecao() {
+            const selecionados = [];
+            
+            // Captura todos os checkboxes selecionados
+            document.querySelectorAll('.aluno-checkbox:checked').forEach(checkbox => {
+                const alunoId = checkbox.dataset.alunoId;
+                const arquivos = JSON.parse(checkbox.dataset.arquivos);
+
+                selecionados.push({
+                    aluno_id: alunoId,
+                    arquivos: arquivos
+                });
+            });
+
+            // Envia o JSON ao backend via fetch
+            fetch('/avaliar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(selecionados)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Exibe a resposta do backend
+                document.getElementById('resultado').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Seleção de Alunos para Análise de Perfil</h1>
+
+    <form onsubmit="event.preventDefault(); enviarSelecao();">
+        <table>
+            <thead>
+                <tr>
+                    <th>Selecionar</th>
+                    <th>Nome</th>
+                    <th>Curso</th>
+                    <th>Arquivos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                <tr>
+                    <td>
+                        <input 
+                            type="checkbox" 
+                            class="aluno-checkbox" 
+                            data-aluno-id="{{ aluno.id }}" 
+                            data-arquivos='[{% for arquivo in aluno.arquivos.all %}{"nome": "{{ arquivo.arquivo.name }}", "url": "{{ arquivo.arquivo.url }}"}{% if not forloop.last %}, {% endif %}{% endfor %}]'>
+                    </td>
+                    <td>{{ aluno.nome }}</td>
+                    <td>{{ aluno.curso }}</td>
+                    <td>
+                        {% for arquivo in aluno.arquivos.all %}
+                            <a href="{{ arquivo.arquivo.url }}" download>{{ arquivo.arquivo.name|basename }}</a><br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Enviar para Análise</button>
+    </form>
+
+    <h2>Resultado da Análise:</h2>
+    <pre id="resultado"></pre>
+</body>
+</html>
