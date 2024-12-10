@@ -25,13 +25,15 @@ def cadastro_aluno(request):
         aluno_form = AlunoForm(request.POST)
 
         if aluno_form.is_valid():
+            # Salva o aluno no banco de dados
             aluno = aluno_form.save()
 
-            # Processando múltiplos arquivos e tipos
+            # Processa múltiplos arquivos e tipos enviados
             arquivos = request.FILES.getlist('arquivos[]')
             tipos = request.POST.getlist('tipo[]')
 
             for arquivo, tipo in zip(arquivos, tipos):
+                # Cria um registro de arquivo associado ao aluno
                 Arquivo.objects.create(aluno=aluno, tipo=tipo, arquivo=arquivo)
 
             # Criar o JSON com os dados do aluno e dos arquivos
@@ -50,8 +52,10 @@ def cadastro_aluno(request):
                 'arquivos': [{'tipo': arq.tipo, 'url': arq.arquivo.url} for arq in aluno.arquivos.all()],
                 'data_cadastro': aluno.data_cadastro.isoformat(),
             }
+
+            print("Dados do Aluno:", aluno_json)  # Exibe no console (opcional)
             
-            return redirect('home')
+            return redirect('home')  # Redireciona para a página inicial
 
     else:
         aluno_form = AlunoForm()
@@ -83,30 +87,46 @@ def area_professor(request):
     return render(request, 'home/area_professor.html', {'alunos': alunos})
 
 def verificador_de_documento(request):
-    response_data = None
     if request.method == 'POST':
         body = json.loads(request.body)
 
-        analise_resultados = []
+        # Lista para armazenar as análises de cada aluno
+        analise_individual = []
 
         for aluno in body:
-            aluno_id = aluno['aluno_id']
-            arquivos = aluno['arquivos'] 
-            print(arquivos)
-
+            arquivos = aluno['arquivos']
+            
             prompt_para_ia = []
-            prompt = "resuma cada um destes arquivos e me retorne um resumo geral sobre o aluno"
+            prompt = f"Fale um pouco sobre cada arquivo deste aluno e dê uma nota profissional."
 
             for arquivo in arquivos:
                 nome_arquivo = arquivo['nome']
-                print(nome_arquivo)
-                sample_file = extract_text_from_pdf(nome_arquivo)
+                print(f"Lendo o arquivo: {nome_arquivo}")
+                sample_file = extract_text_from_pdf(nome_arquivo)  # Extração do texto do PDF
                 prompt_para_ia.append(sample_file)
-            prompt_para_ia.insert(0, prompt)    
-            response = model.generate_content(prompt_para_ia)  
-            analise_resultados.append(response.text)
-        print(analise_resultados)
-        return render(request,'parcial/resultado.html',{'analise_resultados': analise_resultados})
+
+            # Insere o prompt inicial para análise individual
+            prompt_para_ia.insert(0, prompt)
+            
+            # Gera a análise individual do aluno
+            response = model.generate_content(prompt_para_ia)
+            
+            # Salva a análise individual com o nome do aluno
+            analise_individual.append(response.text)
+
+        print("Resultados Individuais:", analise_individual)
+
+            # Construir o prompt comparativo
+        prompt_comparativo = "Se comporte como um professor de mestrado avaliando perfis de alunos. Compare os seguintes alunos com base em seus resumos e dê um ranking:"
+        comparativo_para_ia = [prompt_comparativo]
+        
+            # Adicionar resumos ao prompt comparativo
+        for analise in analise_individual:
+            comparativo_para_ia.append(f"{analise}")
+
+            # Gera o ranking comparativo
+        response_comparativo = model.generate_content(comparativo_para_ia)
+        return render(request, 'parcial/resultado.html', {'analise_resultados': response_comparativo.text })
 
     else: 
         alunos = Aluno.objects.all()
