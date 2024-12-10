@@ -1,0 +1,9 @@
+{% if analise_resultados %}
+    <ul>
+        {% for resultado in analise_resultados %}
+            <li>{{ resultado }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhuma análise foi realizada.</p>
+{% endif %}

@@ -83,6 +83,7 @@ def area_professor(request):
     return render(request, 'home/area_professor.html', {'alunos': alunos})
 
 def verificador_de_documento(request):
+    response_data = None
     if request.method == 'POST':
         body = json.loads(request.body)
 
@@ -102,27 +103,13 @@ def verificador_de_documento(request):
                 sample_file = extract_text_from_pdf(nome_arquivo)
                 prompt_para_ia.append(sample_file)
             
-            prompt_para_ia.insert(0, prompt)
+            
 
-            response = model.generate_content(prompt_para_ia)
-            try:
-                aluno_obj = Aluno.objects.get(pk=aluno_id)
-
-                analise_resultados.append({
-                    'aluno': aluno_obj.nome,
-                    'resumo': response.text
-                })
-            except Aluno.DoesNotExist:
-                analise_resultados.append({
-                    'aluno': f"ID {aluno_id}",
-                    'erro': "Aluno não encontrado"
-                })
-
-        resumos = "\n".join([resultado['resumo'] for resultado in analise_resultados if 'resumo' in resultado])
-
-        # Retorna apenas o texto como resposta
-        return HttpResponse(resumos, content_type="text/plain")
-
+            prompt_para_ia.insert(0, prompt)    
+            response = model.generate_content(prompt_para_ia)  
+            analise_resultados.append(response.text)
+        print(analise_resultados)
+        return render(request,'parcial/resultado.html',{'analise_resultados': analise_resultados})
 
     else: 
         alunos = Aluno.objects.all()

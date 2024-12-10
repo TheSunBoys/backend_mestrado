@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load custom_filters %}
     <title>Seleção de Alunos para Análise</title>
     <script>
         function enviarSelecao() {
@@ -29,10 +28,10 @@
                 },
                 body: JSON.stringify(selecionados)
             })
-            .then(response => response.json())
+            .then(response => response.text())  // Captura o texto retornado pelo backend
             .then(data => {
-                // Exibe a resposta do backend
-                document.getElementById('resultado').innerText = JSON.stringify(data, null, 2);
+                // Atualiza o conteúdo da página com os resultados retornados
+                document.querySelector('#resultado-analise').innerHTML = data;
             })
             .catch(error => console.error('Erro:', error));
         }
@@ -41,6 +40,7 @@
 <body>
     <h1>Seleção de Alunos para Análise de Perfil</h1>
 
+    <!-- Formulário -->
     <form onsubmit="event.preventDefault(); enviarSelecao();">
         <table>
             <thead>
@@ -65,7 +65,7 @@
                     <td>{{ aluno.curso }}</td>
                     <td>
                         {% for arquivo in aluno.arquivos.all %}
-                            <a href="{{ arquivo.arquivo.url }}" download>{{ arquivo.arquivo.name|basename }}</a><br>
+                            <a href="{{ arquivo.arquivo.url }}" download>{{ arquivo.arquivo.name }}</a><br>
                         {% endfor %}
                     </td>
                 </tr>
@@ -75,7 +75,19 @@
         <button type="submit">Enviar para Análise</button>
     </form>
 
-    <h2>Resultado da Análise:</h2>
-    <pre id="resultado"></pre>
+    <!-- Resultados da Análise -->
+    <h2>Resultado da Análise</h2>
+    <div id="resultado-analise">
+        {% if analise_resultados %}
+            <ul>
+                {% for resultado in analise_resultados %}
+                    <li>{{ resultado }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nenhuma análise foi realizada.</p>
+        {% endif %}
+    </div>
 </body>
 </html>
+    
