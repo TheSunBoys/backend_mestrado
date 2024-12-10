@@ -1,0 +1,94 @@
+/* Estilo geral */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa;
+}
+
+h1 {
+    text-align: center;
+    color: #3b3398;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    color: #3b3398;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="file"], select, input[type="text"], input[type="number"], input[type="email"], input[name="lattes"], input[name="github"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    outline: none;
+    transition: box-shadow 0.3s;
+}
+
+input[type="file"]:focus, select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[name="lattes"]:focus, input[name="github"]:focus {
+    box-shadow: 0 2px 5px rgba(59, 51, 152, 0.5);
+    border-color: #3b3398;
+}
+
+button {
+    display: inline-block;
+    background-color: #3b3398;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2a2271;
+}
+
+#arquivos-container {
+    margin-top: 20px;
+}
+
+.arquivo-campo {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.arquivo-campo label {
+    margin-bottom: 10px;
+}
+
+/* Mensagens de confirmação */
+button[type="button"] {
+    background-color: #007bff;
+}
+
+button[type="button"]:hover {
+    background-color: #0056b3;
+}

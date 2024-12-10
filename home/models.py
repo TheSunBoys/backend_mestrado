@@ -1,4 +1,3 @@
-# models.py
 from django.db import models
 
 class Aluno(models.Model):
@@ -12,22 +11,25 @@ class Aluno(models.Model):
     interesse = models.CharField(max_length=255)
     genero = models.CharField(max_length=50)
     ppi = models.CharField(max_length=50)
-    cpf = models.CharField(max_length=11)  # Para criar o diretório com base no CPF
+    cpf = models.CharField(max_length=11) 
     data_cadastro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nome
 
     def get_upload_path(self):
-        # Definindo o caminho para armazenar os arquivos do aluno, incluindo seu nome e CPF
         return f"alunos/{self.nome}_{self.cpf}/"
     class Meta:
         db_table = 'meu_nome_personalizado_da_tabela'
+
+def arquivo_upload_path(instance, filename):
+    aluno = instance.aluno
+    return f"{aluno.get_upload_path()}{filename}"
+
 class Arquivo(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='arquivos')
-    tipo = models.CharField(max_length=255)  # Para identificar o tipo de documento (Ex.: 'curriculo', 'projeto', etc.)
-    arquivo = models.FileField(upload_to='')  # Usaremos a função get_upload_path para o upload
+    tipo = models.CharField(max_length=255)
+    arquivo = models.FileField(upload_to=arquivo_upload_path)  
 
-    def save(self, *args, **kwargs):
-        self.arquivo.name = f"{self.aluno.get_upload_path()}{self.arquivo.name}"
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"Arquivo {self.tipo} de {self.aluno.nome}"

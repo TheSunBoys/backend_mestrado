@@ -1,0 +1,111 @@
+/* Estilo geral */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa;
+}
+
+h1 {
+    text-align: center;
+    color: #3b3398;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+a.btn-voltar {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #3b3398;
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+a.btn-voltar:hover {
+    background-color: #2a2271;
+}
+
+form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #3b3398;
+    margin-top: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #3b3398;
+    color: white;
+    font-weight: bold;
+}
+
+input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-right: 10px;
+}
+
+input[type="text"], input[type="email"], input[name="lattes"], input[name="github"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    outline: none;
+    transition: box-shadow 0.3s;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[name="lattes"]:focus, input[name="github"]:focus {
+    box-shadow: 0 2px 5px rgba(59, 51, 152, 0.5);
+    border-color: #3b3398;
+}
+
+button {
+    display: inline-block;
+    background-color: #3b3398;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2a2271;
+}
+
+#resultado-analise {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
