@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-import google.generativeai as genai
+from google import genai
 from django.http import JsonResponse, HttpResponse
 from .forms import AlunoForm, ArquivoForm
 from .models import Aluno, Arquivo
@@ -10,9 +10,7 @@ import PyPDF2
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
 
-genai.configure(api_key=google_api_key)
-
-model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+client = genai.Client(api_key=google_api_key)
 
 def home(request):
     return render(request, 'home/home.html')
@@ -22,18 +20,14 @@ def cadastro_aluno(request):
         aluno_form = AlunoForm(request.POST)
 
         if aluno_form.is_valid():
-            # Salva o aluno no banco de dados
             aluno = aluno_form.save()
 
-            # Processa múltiplos arquivos e tipos enviados
             arquivos = request.FILES.getlist('arquivos[]')
             tipos = request.POST.getlist('tipo[]')
 
             for arquivo, tipo in zip(arquivos, tipos):
-                # Cria um registro de arquivo associado ao aluno
                 Arquivo.objects.create(aluno=aluno, tipo=tipo, arquivo=arquivo)
 
-            # Criar o JSON com os dados do aluno e dos arquivos
             aluno_json = {
                 'nome': aluno.nome,
                 'idade': aluno.idade,
@@ -50,9 +44,9 @@ def cadastro_aluno(request):
                 'data_cadastro': aluno.data_cadastro.isoformat(),
             }
 
-            print("Dados do Aluno:", aluno_json)  # Exibe no console (opcional)
+            print("Dados do Aluno:", aluno_json)
             
-            return redirect('home')  # Redireciona para a página inicial
+            return redirect('home')
 
     else:
         aluno_form = AlunoForm()
@@ -60,20 +54,12 @@ def cadastro_aluno(request):
     return render(request, 'home/cadastro.html', {'aluno_form': aluno_form})
 
 def deletar_aluno(request, aluno_id):
-    # Busca o aluno pelo ID (caso o aluno não exista, retorna erro 404)
     aluno = get_object_or_404(Aluno, pk=aluno_id)
 
     if request.method == 'POST':
-        # Excluir os arquivos relacionados ao aluno
         aluno.arquivos.all().delete()
-        
-        # Excluir o aluno
         aluno.delete()
-
-        # Exibir mensagem de sucesso
         messages.success(request, f'Aluno {aluno.nome} deletado com sucesso.')
-
-        # Redirecionar para a página da área do professor
         return redirect('area_professor')
 
     return render(request, 'home/confirmar_deletar.html', {'aluno': aluno})
@@ -87,7 +73,6 @@ def verificador_de_documento(request):
     if request.method == 'POST':
         body = json.loads(request.body)
 
-        # Lista para armazenar as análises de cada aluno
         analise_individual = []
 
         for aluno in body:
@@ -99,30 +84,25 @@ def verificador_de_documento(request):
             for arquivo in arquivos:
                 nome_arquivo = arquivo['nome']
                 print(f"Lendo o arquivo: {nome_arquivo}")
-                sample_file = extract_text_from_pdf(nome_arquivo)  # Extração do texto do PDF
+                sample_file = extract_text_from_pdf(nome_arquivo)
                 prompt_para_ia.append(sample_file)
 
-            # Insere o prompt inicial para análise individual
             prompt_para_ia.insert(0, prompt)
             
-            # Gera a análise individual do aluno
-            response = model.generate_content(prompt_para_ia)
+            response = client.models.generate_content(model="gemini-1.5-flash",
+                                                      contents=prompt_para_ia)
             
-            # Salva a análise individual com o nome do aluno
             analise_individual.append(response.text)
 
         print("Resultados Individuais:", analise_individual)
-
-            # Construir o prompt comparativo
         prompt_comparativo = "Se comporte como um professor de mestrado avaliando perfis de alunos. Compare os seguintes alunos com base em seus resumos e dê um ranking:"
         comparativo_para_ia = [prompt_comparativo]
         
-            # Adicionar resumos ao prompt comparativo
         for analise in analise_individual:
             comparativo_para_ia.append(f"{analise}")
 
-            # Gera o ranking comparativo
-        response_comparativo = model.generate_content(comparativo_para_ia)
+        response_comparativo = client.models.generate_content(model="gemini-1.5-flash",
+                                                              contents=comparativo_para_ia)
         return render(request, 'parcial/resultado.html', {'analise_resultados': response_comparativo.text })
 
     else: 
