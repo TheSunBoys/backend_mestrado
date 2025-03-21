@@ -3,3 +3,4 @@ google-ai-generativelanguage
 google-generativeai
 PyMuPDF
 PyPDF2
+google-genai==1.7.0
