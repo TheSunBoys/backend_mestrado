@@ -3,3 +3,5 @@ google-ai-generativelanguage
 google-generativeai
 PyMuPDF
 PyPDF2
+psycopg2
+psycopg2-binary
