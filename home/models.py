@@ -20,7 +20,7 @@ class Aluno(models.Model):
     def get_upload_path(self):
         return f"alunos/{self.nome}_{self.cpf}/"
     class Meta:
-        db_table = 'meu_nome_personalizado_da_tabela'
+        db_table = 'alunos'
 
 def arquivo_upload_path(instance, filename):
     aluno = instance.aluno

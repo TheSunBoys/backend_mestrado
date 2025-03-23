@@ -6,11 +6,16 @@ from .forms import AlunoForm, ArquivoForm
 from .models import Aluno, Arquivo
 import json
 import PyPDF2
+from django.contrib.auth.decorators import login_required
 
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
 
 client = genai.Client(api_key=google_api_key)
+
+@login_required
+def dashboard(request):
+    return render(request, 'home/dashboard.html')
 
 def home(request):
     return render(request, 'home/home.html')
