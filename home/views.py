@@ -77,7 +77,7 @@ def verificador_de_documento(request):
 
         for aluno in body:
             arquivos = aluno['arquivos']
-
+            ira = aluno.get('ira', None)
             prompt_para_ia = []
             prompt = f"""Você é um avaliador acadêmico real do Processo Seletivo do Mestrado em Ciência da Computação da UFERSA/UERN, portanto irá se portar de formal e técnica.
     Com base no Edital Nº 05/2024 – PPGCC/UERN, avalie o currículo abaixo seguindo rigorosamente os critérios estabelecidos.
@@ -110,12 +110,15 @@ def verificador_de_documento(request):
        - POSCOMP: (Percentual de acertos × 3)
        - Disciplinas cursadas no PPgCC: (Nº de créditos × 0.25)
 
+    ### **Informações do Candidato:**
+    - **IRA:** {ira}
+
     ### **Cálculo da Média Final (MF):**
     MP = (NRE * 0.5) + (NC * 0.5)
     MF = (MP * 0.5)
 
 
-    após os cálculos Agora avalie o currículo abaixo com base nesses critérios, atribua uma **nota de 0 a 10** e forneça uma **justificativa detalhada** explicando os pontos fortes e fracos do candidato e Retorne a nota final e a justificativa da avaliação. lembre-se de avisar para adicionar NAR(nota de arguição oral) a MF(média final)"""
+    após os cálculos Agora avalie o currículo abaixo com base nesses critérios, atribua uma **nota de 0 a 10**, forneça essa nota de 0 a 10 na justificativa e forneça uma **justificativa detalhada** explicando os pontos fortes e fracos do candidato e Retorne a nota final e a justificativa da avaliação. lembre-se de avisar para adicionar NAR(nota de arguição oral) a MF(média final)"""
 
             for arquivo in arquivos:
                 nome_arquivo = arquivo['nome']
