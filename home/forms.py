@@ -1,5 +1,6 @@
 from django import forms
 from .models import Aluno, Arquivo
+from .models import Edital
 
 class AlunoForm(forms.ModelForm):
     class Meta:
@@ -19,3 +20,8 @@ class ArquivoForm(forms.ModelForm):
     class Meta:
         model = Arquivo
         fields = ['tipo', 'arquivo']
+
+class EditalForm(forms.ModelForm):
+    class Meta:
+        model = Edital
+        fields = ['titulo', 'descricao', 'arquivo', 'autor', 'ativo']

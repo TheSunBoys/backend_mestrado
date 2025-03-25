@@ -1,0 +1,19 @@
+
+{% block content %}
+<h1>Editais Publicados</h1>
+<a href="{% url 'criar_edital' %}" class="btn btn-primary">Novo Edital</a>
+
+<ul>
+    {% for edital in editais %}
+    <li>
+        <h3>{{ edital.titulo }}</h3>
+        <p>{{ edital.descricao }}</p>
+        <p><strong>Autor:</strong> {{ edital.autor }}</p>  <!-- Exibe o texto do autor -->
+        <a href="{{ edital.arquivo.url }}" download>Baixar Edital</a>
+        <small>Publicado em: {{ edital.data_publicacao }}</small>
+        <a href="{% url 'editar_edital' edital.id %}" class="btn btn-sm btn-warning">Editar</a>
+        <a href="{% url 'deletar_edital' edital.id %}" class="btn btn-sm btn-danger">Desativar</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

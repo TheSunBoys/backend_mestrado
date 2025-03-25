@@ -33,3 +33,13 @@ class Arquivo(models.Model):
 
     def __str__(self):
         return f"Arquivo {self.tipo} de {self.aluno.nome}"
+
+class Edital(models.Model):
+    titulo = models.CharField(max_length=200)
+    descricao = models.TextField()
+    arquivo = models.FileField(upload_to='editais/')  # Arquivos serão salvos em MEDIA_ROOT/editais/
+    data_publicacao = models.DateTimeField(auto_now_add=True)
+    autor = models.CharField(max_length=100) 
+    ativo = models.BooleanField(default=True)
+    def __str__(self):
+        return self.titulo

@@ -7,6 +7,8 @@ from .models import Aluno, Arquivo
 import json
 import PyPDF2
 from django.contrib.auth.decorators import login_required
+from .models import Edital
+from .forms import EditalForm
 
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
@@ -123,3 +125,37 @@ def extract_text_from_pdf(pdf_path):
             if text:
                 extracted_text += text
         return extracted_text
+
+def index(request):
+    editais = Edital.objects.filter(ativo=True).order_by('-data_publicacao')
+    return render(request, 'editais/index.html', {'editais': editais})
+
+# Criar edital (CREATE)
+def criar_edital(request):
+    if request.method == 'POST':
+        form = EditalForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()  # Agora o autor é digitado no formulário
+            return redirect('index_editais')
+    else:
+        form = EditalForm()
+    return render(request, 'editais/criar.html', {'form': form})
+
+# Editar edital (UPDATE)
+def editar_edital(request, id):
+    edital = get_object_or_404(Edital, pk=id)
+    if request.method == 'POST':
+        form = EditalForm(request.POST, request.FILES, instance=edital)
+        if form.is_valid():
+            form.save()
+            return redirect('index_editais')
+    else:
+        form = EditalForm(instance=edital)
+    return render(request, 'editais/editar.html', {'form': form})
+
+# "Deletar" (marcar como inativo)
+def deletar_edital(request, id):
+    edital = get_object_or_404(Edital, pk=id)
+    edital.ativo = False
+    edital.save()
+    return redirect('index_editais')
