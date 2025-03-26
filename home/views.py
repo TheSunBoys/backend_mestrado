@@ -7,7 +7,7 @@ from .models import Aluno, Arquivo
 import json
 import PyPDF2
 from django.contrib.auth.decorators import login_required
-from .models import Edital
+from .models import Edital, Selecao
 from .forms import EditalForm, InscricaoForm
 
 with open('key.json', 'r') as f:
