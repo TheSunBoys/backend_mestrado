@@ -15,4 +15,5 @@ urlpatterns = [
     path('novo/', views.criar_edital, name='criar_edital'),
     path('<int:id>/editar/', views.editar_edital, name='editar_edital'),
     path('<int:id>/deletar/', views.deletar_edital, name='deletar_edital'),
+    path('selecao/<int:selecao_id>/inscrever/', views.inscrever_selecao, name='inscrever_selecao'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

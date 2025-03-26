@@ -8,7 +8,7 @@ import json
 import PyPDF2
 from django.contrib.auth.decorators import login_required
 from .models import Edital
-from .forms import EditalForm
+from .forms import EditalForm, InscricaoForm
 
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
@@ -130,18 +130,16 @@ def index(request):
     editais = Edital.objects.filter(ativo=True).order_by('-data_publicacao')
     return render(request, 'editais/index.html', {'editais': editais})
 
-# Criar edital (CREATE)
 def criar_edital(request):
     if request.method == 'POST':
         form = EditalForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # Agora o autor é digitado no formulário
+            form.save()
             return redirect('index_editais')
     else:
         form = EditalForm()
     return render(request, 'editais/criar.html', {'form': form})
 
-# Editar edital (UPDATE)
 def editar_edital(request, id):
     edital = get_object_or_404(Edital, pk=id)
     if request.method == 'POST':
@@ -153,9 +151,28 @@ def editar_edital(request, id):
         form = EditalForm(instance=edital)
     return render(request, 'editais/editar.html', {'form': form})
 
-# "Deletar" (marcar como inativo)
 def deletar_edital(request, id):
     edital = get_object_or_404(Edital, pk=id)
     edital.ativo = False
     edital.save()
     return redirect('index_editais')
+
+@login_required
+def inscrever_selecao(request, selecao_id):
+    selecao = get_object_or_404(Selecao, id=selecao_id)
+    
+    if request.method == 'POST':
+        form = InscricaoForm(request.POST, request.FILES)
+        if form.is_valid():
+            inscricao = form.save(commit=False)
+            inscricao.aluno = request.user
+            inscricao.selecao = selecao
+            inscricao.save()
+            return redirect('detalhes_selecao', selecao_id=selecao.id)
+    else:
+        form = InscricaoForm()
+    
+    return render(request, 'inscricao/formulario.html', {
+        'form': form,
+        'selecao': selecao
+    })

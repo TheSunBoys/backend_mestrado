@@ -1,6 +1,5 @@
 from django import forms
-from .models import Aluno, Arquivo
-from .models import Edital
+from .models import Aluno, Arquivo, Edital, Inscricao
 
 class AlunoForm(forms.ModelForm):
     class Meta:
@@ -25,3 +24,11 @@ class EditalForm(forms.ModelForm):
     class Meta:
         model = Edital
         fields = ['titulo', 'descricao', 'arquivo', 'autor', 'ativo']
+
+class InscricaoForm(forms.ModelForm):
+    class Meta:
+        model = Inscricao
+        fields = ['documento']
+        widgets = {
+            'documento': forms.FileInput(attrs={'accept': '.pdf,.doc,.docx'})
+        }
