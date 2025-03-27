@@ -8,11 +8,10 @@
             <h1 class="display-4">Dashboard</h1>
             <p class="lead text-muted">Bem-vindo, {{ user.get_full_name|default:user.username }}</p>
         </div>
-        <div>
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
-                <i class="bi bi-box-arrow-right"></i> Sair
-            </a>
-        </div>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Sair</button>
+        </form>
     </div>
 
     <!-- Cards de Redirecionamento -->
@@ -90,7 +89,7 @@
             {% if editais_recentes %}
                 <div class="list-group">
                     {% for edital in editais_recentes %}
-                    <a href="{% url 'exibir_edital' edital.id %}" class="list-group-item list-group-item-action">
+                    <a href="#" class="list-group-item list-group-item-action">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{ edital.titulo }}</h5>
                             <small>{{ edital.data_publicacao|date:"d/m/Y" }}</small>

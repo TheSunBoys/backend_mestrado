@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Seleção</title>
+</head>
+<body>
+    <h1>Editar Seleção</h1>
+    <h2>Edital: {{ selecao.edital.titulo }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div>
+            <label>Data de Início*</label>
+            {{ form.data_inicio }}
+            {% if form.data_inicio.errors %}
+            <div>
+                {% for error in form.data_inicio.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label>Data de Término*</label>
+            {{ form.data_fim }}
+            {% if form.data_fim.errors %}
+            <div>
+                {% for error in form.data_fim.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label>Número de Vagas*</label>
+            {{ form.vagas }}
+            {% if form.vagas.errors %}
+            <div>
+                {% for error in form.vagas.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <a href="{% url 'detalhes_selecao' selecao.id %}">Cancelar</a>
+            <button type="submit">Atualizar Seleção</button>
+        </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Criar Edital</title>
+</head>
+<body>
+    <h1>Criar Novo Edital</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div>
+            <label>Título*</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}
+            <div>
+                {% for error in form.titulo.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label>Descrição*</label>
+            {{ form.descricao }}
+            {% if form.descricao.errors %}
+            <div>
+                {% for error in form.descricao.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label>Documento*</label>
+            {{ form.arquivo }}
+            {% if form.arquivo.errors %}
+            <div>
+                {% for error in form.arquivo.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <p>Apenas arquivos PDF</p>
+        </div>
+
+        <div>
+            <a href="{% url 'listar_editais' %}">Cancelar</a>
+            <button type="submit">Salvar Edital</button>
+        </div>
+    </form>
+</body>
+</html>

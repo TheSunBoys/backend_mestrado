@@ -1,0 +1,103 @@
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        {% if editando %}
+                            <i class="bi bi-person-gear"></i> Editar Perfil Professor
+                        {% else %}
+                            <i class="bi bi-person-plus"></i> Completar Perfil Professor
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Informações Básicas -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nome</label>
+                                <input type="text" class="form-control" value="{{ usuario.get_full_name }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="text" class="form-control" value="{{ usuario.email }}" disabled>
+                            </div>
+                        </div>
+                        
+                        <h4 class="h5 text-primary mb-3">
+                            <i class="bi bi-building"></i> Informações Acadêmicas
+                        </h4>
+                        <hr>
+                        
+                        <!-- Departamento -->
+                        <div class="mb-3">
+                            <label for="{{ form.departamento.id_for_label }}" class="form-label">
+                                Departamento*
+                            </label>
+                            {{ form.departamento }}
+                            {% if form.departamento.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.departamento.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Lattes e Área de Atuação -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.lattes.id_for_label }}" class="form-label">
+                                    Currículo Lattes
+                                </label>
+                                {{ form.lattes }}
+                                <small class="form-text text-muted">URL completo do seu Lattes</small>
+                                {% if form.lattes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.lattes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.area_atuacao.id_for_label }}" class="form-label">
+                                    Área de Atuação
+                                </label>
+                                {{ form.area_atuacao }}
+                                {% if form.area_atuacao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.area_atuacao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'area_professor' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if editando %}
+                                    <i class="bi bi-check-circle"></i> Atualizar Perfil
+                                {% else %}
+                                    <i class="bi bi-check-circle"></i> Completar Cadastro
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

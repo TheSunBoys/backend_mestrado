@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ edital.titulo }}</title>
+</head>
+<body>
+    <h1>{{ edital.titulo }}</h1>
+    
+    {% if pode_criar_selecao %}
+    <a href="{% url 'criar_selecao' edital.id %}">Nova Seleção</a>
+    {% endif %}
+    <a href="{{ edital.arquivo.url }}" download>Baixar PDF</a>
+
+    <h2>Descrição do Edital</h2>
+    <p>{{ edital.descricao|linebreaks }}</p>
+
+    <div>
+        <p><strong>Status:</strong> {% if edital.ativo %}Ativo{% else %}Inativo{% endif %}</p>
+        <p><strong>Data de Publicação:</strong> {{ edital.data_publicacao|date:"d/m/Y H:i" }}</p>
+        <p><strong>Criado por:</strong> {{ edital.criado_por.get_full_name }}</p>
+    </div>
+
+    <h2>Seleções Vinculadas</h2>
+    {% if selecoes %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Professor</th>
+                <th>Período</th>
+                <th>Vagas</th>
+                <th>Inscrições</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for selecao in selecoes %}
+            <tr>
+                <td>{{ selecao.professor_responsavel.get_full_name }}</td>
+                <td>
+                    {{ selecao.data_inicio|date:"d/m/Y" }}<br>
+                    até<br>
+                    {{ selecao.data_fim|date:"d/m/Y" }}
+                </td>
+                <td>{{ selecao.vagas }}</td>
+                <td>{{ selecao.inscricoes.count }}</td>
+                <td>{% if selecao.data_fim < now %}Encerrada{% else %}Ativa{% endif %}</td>
+                <td>
+                    <a href="{% url 'detalhes_selecao' selecao.id %}">Detalhes</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhuma seleção vinculada a este edital.</p>
+    {% endif %}
+</body>
+</html>

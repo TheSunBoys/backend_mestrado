@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Editais</title>
+</head>
+<body>
+    <h1>Editais Disponíveis</h1>
+    
+    {% if user.tipo_usuario == 'professor' or user.is_superuser %}
+    <a href="{% url 'criar_edital' %}">Novo Edital</a>
+    {% endif %}
+    
+    {% if editais %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Publicação</th>
+                <th>Status</th>
+                <th>Criado por</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for edital in editais %}
+            <tr>
+                <td>{{ edital.titulo }}</td>
+                <td>{{ edital.data_publicacao|date:"d/m/Y" }}</td>
+                <td>{% if edital.ativo %}Ativo{% else %}Inativo{% endif %}</td>
+                <td>{{ edital.criado_por.get_full_name }}</td>
+                <td>
+                    <a href="{% url 'exibir_edital' edital.id %}">Ver</a>
+                    {% if user == edital.criado_por or user.is_superuser %}
+                    <a href="{% url 'editar_edital' edital.id %}">Editar</a>
+                    <a href="{% url 'excluir_edital' edital.id %}">Excluir</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhum edital disponível no momento.</p>
+    {% endif %}
+</body>
+</html>

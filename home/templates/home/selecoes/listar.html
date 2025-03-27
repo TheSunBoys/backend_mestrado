@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Seleções</title>
+</head>
+<body>
+    <h1>Seleções Disponíveis</h1>
+    
+    {% if user.tipo_usuario == 'professor' %}
+    <a href="{% url 'criar_selecao' edital.id %}">Nova Seleção</a>
+    {% endif %}
+    
+    {% if selecoes %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Edital</th>
+                <th>Professor</th>
+                <th>Período</th>
+                <th>Vagas</th>
+                <th>Inscrições</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for selecao in selecoes %}
+            <tr>
+                <td>{{ selecao.edital.titulo }}</td>
+                <td>{{ selecao.professor_responsavel.get_full_name }}</td>
+                <td>
+                    {{ selecao.data_inicio|date:"d/m/Y" }} a 
+                    {{ selecao.data_fim|date:"d/m/Y" }}
+                </td>
+                <td>{{ selecao.vagas }}</td>
+                <td>{{ selecao.inscricoes.count }}</td>
+                <td>
+                    <a href="{% url 'detalhes_selecao' selecao.id %}">Ver</a>
+                    {% if user == selecao.professor_responsavel or user.is_superuser %}
+                    <a href="{% url 'editar_selecao' selecao.id %}">Editar</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhuma seleção disponível no momento.</p>
+    {% endif %}
+    
+    <a href="{% url 'listar_editais' %}">Voltar para Editais</a>
+</body>
+</html>

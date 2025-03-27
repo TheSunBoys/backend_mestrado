@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Edital</title>
+</head>
+<body>
+    <h1>Editar Edital</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div>
+            <label>Título*</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}
+            <div>
+                {% for error in form.titulo.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label>Descrição*</label>
+            {{ form.descricao }}
+            {% if form.descricao.errors %}
+            <div>
+                {% for error in form.descricao.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label>Documento Atual:</label>
+            <a href="{{ edital.arquivo.url }}" target="_blank">Visualizar PDF</a>
+            <label>Substituir Documento</label>
+            {{ form.arquivo }}
+            {% if form.arquivo.errors %}
+            <div>
+                {% for error in form.arquivo.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.ativo }}
+            <label>Edital Ativo</label>
+        </div>
+
+        <div>
+            <a href="{% url 'listar_editais' %}">Cancelar</a>
+            <button type="submit">Atualizar Edital</button>
+        </div>
+    </form>
+</body>
+</html>

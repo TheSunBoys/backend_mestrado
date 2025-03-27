@@ -1,0 +1,113 @@
+{% block content %}
+<div class="container py-5">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Área do Aluno</h1>
+        <div>
+            <a href="{% url 'completar_perfil_aluno' %}" class="btn btn-outline-primary me-2">
+                <i class="bi bi-pencil-square"></i> Editar Perfil
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Seção de Perfil -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Meu Perfil</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Coluna de Informações Pessoais -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h3 class="h6 text-muted">Informações Pessoais</h3>
+                        <hr class="mt-1">
+                        <p><strong>Nome:</strong> {{ perfil.usuario.get_full_name }}</p>
+                        <p><strong>Email:</strong> {{ perfil.usuario.email }}</p>
+                        <p><strong>CPF:</strong> {{ perfil.usuario.cpf|slice:":3" }}.{{ perfil.usuario.cpf|slice:"3:6" }}.{{ perfil.usuario.cpf|slice:"6:9" }}-{{ perfil.usuario.cpf|slice:"9:11" }}</p>
+                        <p><strong>Telefone:</strong> {{ perfil.usuario.telefone }}</p>
+                    </div>
+                </div>
+
+                <!-- Coluna de Informações Acadêmicas -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h3 class="h6 text-muted">Informações Acadêmicas</h3>
+                        <hr class="mt-1">
+                        <p><strong>Curso:</strong> {{ perfil.curso }}</p>
+                        <p><strong>IRA:</strong> {{ perfil.ira }}</p>
+                        <p><strong>GitHub:</strong> 
+                            {% if perfil.github %}
+                                <a href="{{ perfil.github }}" target="_blank">{{ perfil.github }}</a>
+                            {% else %}
+                                Não informado
+                            {% endif %}
+                        </p>
+                        <p><strong>Áreas de Interesse:</strong> {{ perfil.interesse_pesquisa|default:"Não informado" }}</p>
+                        <p><strong>PPI:</strong> {% if perfil.ppi %}Sim{% else %}Não{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Inscrições -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Minhas Inscrições</h2>
+                <a href="{% url 'listar_editais' %}" class="btn btn-sm btn-light">
+                    <i class="bi bi-plus-circle"></i> Nova Inscrição
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if inscricoes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Edital</th>
+                                <th>Professor</th>
+                                <th>Data Inscrição</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscricao in inscricoes %}
+                            <tr>
+                                <td>{{ inscricao.selecao.edital.titulo }}</td>
+                                <td>{{ inscricao.selecao.professor_responsavel.get_full_name }}</td>
+                                <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if inscricao.status == 'aprovada' %}bg-success
+                                        {% elif inscricao.status == 'reprovada' %}bg-danger
+                                        {% else %}bg-warning text-dark{% endif %}">
+                                        {{ inscricao.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'detalhes_selecao' inscricao.selecao.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Você ainda não possui inscrições em editais.
+                    <a href="{% url 'listar_editais' %}" class="alert-link">Clique aqui para ver os editais disponíveis</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

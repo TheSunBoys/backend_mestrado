@@ -1,50 +1,248 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load custom_filters %}
-    <title>Área do Professor</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'TelaHome/area_professor.css' %}">
-</head>
-<body>
-    <h1>Alunos Inscritos</h1>
-    <a href="{% url 'home' %}" class="btn-voltar">Voltar para a página principal</a>
-    <table>
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Curso</th>
-                <th>Arquivo(s)</th>
-                <th>Ação</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for aluno in alunos %}
-                <tr>
-                    <td>{{ aluno.nome }}</td>
-                    <td>{{ aluno.curso }}</td>
-                    <td>
-                        {% for arquivo in aluno.arquivos.all %}
-                            <a href="{{ arquivo.arquivo.url }}" download>{{ arquivo.arquivo.name|basename }}</a><br>
-                        {% empty %}
-                            Nenhum arquivo disponível.
-                        {% endfor %}
-                    </td>
-                    
-                    <td>                       
-                        <a href="{% url 'deletar_aluno' aluno.id %}" onclick="return confirm('Tem certeza que deseja excluir este aluno?')">Excluir</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">Nenhum aluno inscrito.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        
-    </table>
-    <a href="{% url 'avaliar' %}" class="btn-voltar">avaliar alunos</a>
-</body>
-</html>
+
+{% block content %}
+<div class="container py-5">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">Área do Professor</h1>
+            <p class="text-muted mb-0">Bem-vindo, {{ perfil.usuario.get_full_name }}</p>
+        </div>
+        <div>
+            <a href="{% url 'completar_perfil_professor' %}" class="btn btn-outline-primary me-2">
+                <i class="bi bi-pencil-square"></i> Editar Perfil
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Seção de Perfil -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0"><i class="bi bi-person-badge"></i> Meu Perfil</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Coluna de Informações Pessoais -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h3 class="h6 text-muted">Informações Pessoais</h3>
+                        <hr class="mt-1">
+                        <p><strong>Nome:</strong> {{ perfil.usuario.get_full_name }}</p>
+                        <p><strong>Email:</strong> {{ perfil.usuario.email }}</p>
+                        <p><strong>CPF:</strong> {{ perfil.usuario.cpf|slice:":3" }}.{{ perfil.usuario.cpf|slice:"3:6" }}.{{ perfil.usuario.cpf|slice:"6:9" }}-{{ perfil.usuario.cpf|slice:"9:11" }}</p>
+                    </div>
+                </div>
+
+                <!-- Coluna de Informações Acadêmicas -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h3 class="h6 text-muted">Informações Acadêmicas</h3>
+                        <hr class="mt-1">
+                        <p><strong>Departamento:</strong> {{ perfil.departamento }}</p>
+                        <p><strong>Área de Atuação:</strong> {{ perfil.area_atuacao|default:"Não informado" }}</p>
+                        <p><strong>Lattes:</strong> 
+                            {% if perfil.lattes %}
+                                <a href="{{ perfil.lattes }}" target="_blank">Ver Currículo</a>
+                            {% else %}
+                                Não informado
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Seleções Ativas -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0"><i class="bi bi-list-task"></i> Minhas Seleções Ativas</h2>
+            <a href="{% url 'listar_editais' %}" class="btn btn-sm btn-light">
+                <i class="bi bi-plus-circle"></i> Nova Seleção
+            </a>
+        </div>
+        <div class="card-body">
+            {% if selecoes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Edital</th>
+                                <th>Período</th>
+                                <th>Vagas</th>
+                                <th>Inscrições</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for selecao in selecoes %}
+                            <tr>
+                                <td>{{ selecao.edital.titulo|truncatechars:30 }}</td>
+                                <td>
+                                    {{ selecao.data_inicio|date:"d/m/Y" }} - 
+                                    {{ selecao.data_fim|date:"d/m/Y" }}
+                                </td>
+                                <td>{{ selecao.vagas }}</td>
+                                <td>
+                                    <span class="badge bg-primary rounded-pill">
+                                        {{ selecao.inscricoes.count }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if selecao.data_fim < now %}
+                                        <span class="badge bg-secondary">Encerrada</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Ativa</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-outline-primary" title="Detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-success" title="Avaliar Inscrições">
+                                            <i class="bi bi-people"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Você não possui seleções ativas no momento.
+                    <a href="{% url 'listar_editais' %}" class="alert-link">Clique aqui para criar uma nova seleção</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Seção de Inscrições Pendentes -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0"><i class="bi bi-hourglass-split"></i> Inscrições Pendentes de Avaliação</h2>
+        </div>
+        <div class="card-body">
+            {% if inscricoes_pendentes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Aluno</th>
+                                <th>Seleção</th>
+                                <th>Data</th>
+                                <th>Documento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscricao in inscricoes_pendentes %}
+                            <tr>
+                                <td>{{ inscricao.aluno.get_full_name }}</td>
+                                <td>{{ inscricao.selecao.edital.titulo|truncatechars:25 }}</td>
+                                <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{{ inscricao.documento.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-text"></i> Visualizar
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=aprovada" class="btn btn-outline-success" title="Aprovar">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                        <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=reprovada" class="btn btn-outline-danger" title="Reprovar">
+                                            <i class="bi bi-x-circle"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info" title="Analisar com IA" onclick="analisarDocumento({{ inscricao.id }})">
+                                            <i class="bi bi-robot"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-success">
+                    Nenhuma inscrição pendente de avaliação no momento.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Análise IA -->
+<div class="modal fade" id="analiseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Análise de Documento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="analiseResult">
+                <!-- Resultado da análise será inserido aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Função para análise de documentos com IA
+function analisarDocumento(inscricaoId) {
+    $('#analiseResult').html(`
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Analisando documento...</p>
+        </div>
+    `);
+    
+    const modal = new bootstrap.Modal(document.getElementById('analiseModal'));
+    modal.show();
+    
+    $.ajax({
+        url: "{% url 'analisar_documentos' %}",
+        method: "POST",
+        data: {
+            inscricao_id: inscricaoId,
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function(response) {
+            $('#analiseResult').html(`
+                <div class="analysis-result">
+                    ${formatAnalysis(response.analise)}
+                </div>
+            `);
+        },
+        error: function(xhr) {
+            $('#analiseResult').html(`
+                <div class="alert alert-danger">
+                    Erro ao analisar documento: ${xhr.responseJSON.error}
+                </div>
+            `);
+        }
+    });
+}
+
+// Formata a análise retornada pela IA
+function formatAnalysis(text) {
+    // Processa o texto para manter quebras de linha e formatação
+    return text.replace(/\n/g, '<br>')
+               .replace(/\d\.\s/g, '<strong>$&</strong>');
+}
+</script>
+{% endblock %}

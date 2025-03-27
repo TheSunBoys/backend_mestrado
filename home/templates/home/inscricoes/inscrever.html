@@ -1,0 +1,44 @@
+{% load inscricao_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inscrição em Seleção</title>
+</head>
+<body>
+    <h1>Inscrição em Seleção</h1>
+    <h2>{{ selecao.edital.titulo }}</h2>
+    
+    <!-- Verificação simplificada -->
+    <!-- and selecao.data_inicio <= now and selecao.data_fim >= now -->
+    {% with ja_inscrito=user.inscricoes.all|has_selecao:selecao %}
+    {% if not ja_inscrito %}
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div>
+            <label>Documento (PDF)*</label>
+            <input type="file" name="documento" accept=".pdf" required>
+            {% if form.documento.errors %}
+                <p style="color:red">{{ form.documento.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label>Observações</label>
+            <textarea name="observacao">{{ form.observacao.value|default:'' }}</textarea>
+        </div>
+        
+        <div>
+            <a href="{% url 'detalhes_selecao' selecao.id %}">Cancelar</a>
+            <button type="submit">Confirmar Inscrição</button>
+        </div>
+    </form>
+    
+    {% else %}
+        <p>Você já está inscrito nesta seleção ou o período de inscrições está encerrado.</p>
+        <a href="{% url 'detalhes_selecao' selecao.id %}">Voltar</a>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>

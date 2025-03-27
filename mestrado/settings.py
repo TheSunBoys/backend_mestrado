@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
-    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -86,10 +85,14 @@ DATABASES = {
     }
 }
 
-
+LOGIN_URL = 'login' 
+LOGIN_REDIRECT_URL = 'login'  
+LOGOUT_REDIRECT_URL = 'home'  
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-AUTH_USER_MODEL = 'accounts.Usuario'
+AUTH_USER_MODEL = 'home.Usuario'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
