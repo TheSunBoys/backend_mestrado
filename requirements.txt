@@ -3,6 +3,7 @@ google-ai-generativelanguage
 google-generativeai
 PyMuPDF
 PyPDF2
+psycopg
 psycopg2
 psycopg2-binary
 google-genai==1.7.0
