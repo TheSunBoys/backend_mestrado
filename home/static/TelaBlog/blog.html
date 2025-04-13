@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universidade - Portal de Avisos e Editais</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .bg-primary-subtle {
+            background-color: #e9f0ff;
+        }
+        .text-justify {
+            text-align: justify;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        .notice-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .badge-category {
+            font-weight: normal;
+            padding: 0.4rem 0.6rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="bg-primary text-white py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-book me-2 fs-3"></i>
+                        <div>
+                            <h1 class="fs-3 mb-0">Universidade Federal</h1>
+                            <p class="mb-0 small">Portal de Avisos e Editais</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <nav class="d-none d-md-flex justify-content-end">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="index.html">Início</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#">Categorias</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#">Arquivos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#">Contato</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu Mobile -->
+    <div class="bg-primary-subtle py-2 d-md-none">
+        <div class="container">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Menu
+                </button>
+                <ul class="dropdown-menu w-100">
+                    <li><a class="dropdown-item" href="index.html">Início</a></li>
+                    <li><a class="dropdown-item" href="#">Categorias</a></li>
+                    <li><a class="dropdown-item" href="#">Arquivos</a></li>
+                    <li><a class="dropdown-item" href="#">Contato</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="container py-4">
+        <div class="row">
+            <!-- Avisos e Editais -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fs-2">Avisos e Editais</h2>
+                        <p class="text-muted">Confira os últimos comunicados, chamadas e avisos da universidade.</p>
+                    </div>
+                    <div class="d-none d-md-block">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Buscar avisos...">
+                            <button class="btn btn-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Busca Mobile -->
+                <div class="d-md-none mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar avisos...">
+                        <button class="btn btn-primary" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Avisos -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-primary badge-category mb-2">Bolsas</span>
+                                <h3 class="fs-5 mb-1">
+                                    <a href="aviso.html" class="text-decoration-none">Inscrições Abertas para Bolsas de Iniciação Científica</a>
+                                </h3>
+                                <p class="notice-date mb-2">
+                                    <i class="bi bi-calendar-event me-1"></i> 25 de Março de 2025
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">As inscrições para o programa anual de bolsas de iniciação científica estão abertas. Estudantes de graduação podem se inscrever até 15 de abril de 2025.</p>
+                        <div class="mt-3">
+                            <a href="aviso.html" class="btn btn-sm btn-outline-primary">Leia mais</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-success badge-category mb-2">Admissões</span>
+                                <h3 class="fs-5 mb-1">
+                                    <a href="#" class="text-decoration-none">Processo Seletivo para Pós-Graduação</a>
+                                </h3>
+                                <p class="notice-date mb-2">
+                                    <i class="bi bi-calendar-event me-1"></i> 20 de Março de 2025
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">O processo seletivo para os programas de pós-graduação do segundo semestre de 2025 está aberto. As inscrições serão aceitas até 30 de maio de 2025.</p>
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-sm btn-outline-primary">Leia mais</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-info badge-category mb-2">Vagas</span>
+                                <h3 class="fs-5 mb-1">
+                                    <a href="#" class="text-decoration-none">Vaga para Professor: Departamento de Ciência da Computação</a>
+                                </h3>
+                                <p class="notice-date mb-2">
+                                    <i class="bi bi-calendar-event me-1"></i> 18 de Março de 2025
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">O Departamento de Ciência da Computação está recebendo candidaturas para uma vaga de professor efetivo com início no segundo semestre.</p>
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-sm btn-outline-primary">Leia mais</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-warning text-dark badge-category mb-2">Eventos</span>
+                                <h3 class="fs-5 mb-1">
+                                    <a href="#" class="text-decoration-none">Conferência Internacional sobre Inovação Educacional</a>
+                                </h3>
+                                <p class="notice-date mb-2">
+                                    <i class="bi bi-calendar-event me-1"></i> 15 de Março de 2025
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">Chamada de trabalhos para a Conferência Internacional sobre Inovação Educacional a ser realizada nos dias 10 a 12 de setembro de 2025.</p>
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-sm btn-outline-primary">Leia mais</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-primary badge-category mb-2">Bolsas</span>
+                                <h3 class="fs-5 mb-1">
+                                    <a href="#" class="text-decoration-none">Inscrições para Bolsas de Estudo para Alunos de Graduação</a>
+                                </h3>
+                                <p class="notice-date mb-2">
+                                    <i class="bi bi-calendar-event me-1"></i> 10 de Março de 2025
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">As inscrições para bolsas de estudo por mérito para o ano letivo 2025-2026 estão abertas para estudantes de graduação.</p>
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-sm btn-outline-primary">Leia mais</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paginação -->
+                <nav aria-label="Navegação de página">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                        </li>
+                        <li class="page-item active" aria-current="page">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Próximo</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Barra Lateral -->
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <!-- Categorias -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="fs-5 mb-0">Categorias</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="#" class="text-decoration-none">Admissões</a>
+                                <span class="badge bg-primary rounded-pill">12</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="#" class="text-decoration-none">Bolsas</a>
+                                <span class="badge bg-primary rounded-pill">8</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="#" class="text-decoration-none">Auxílios</a>
+                                <span class="badge bg-primary rounded-pill">5</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="#" class="text-decoration-none">Vagas</a>
+                                <span class="badge bg-primary rounded-pill">7</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="#" class="text-decoration-none">Eventos</a>
+                                <span class="badge bg-primary rounded-pill">15</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Datas Importantes -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="fs-5 mb-0">Datas Importantes</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <h5 class="fs-6 mb-1">Prazo de Inscrição: Programas de Pós-Graduação</h5>
+                                <p class="mb-0 small text-muted">30 de Maio de 2025</p>
+                            </li>
+                            <li class="list-group-item">
+                                <h5 class="fs-6 mb-1">Submissão de Bolsas de Pesquisa</h5>
+                                <p class="mb-0 small text-muted">15 de Abril de 2025</p>
+                            </li>
+                            <li class="list-group-item">
+                                <h5 class="fs-6 mb-1">Candidaturas para Vagas de Professor</h5>
+                                <p class="mb-0 small text-muted">30 de Abril de 2025</p>
+                            </li>
+                            <li class="list-group-item">
+                                <h5 class="fs-6 mb-1">Início do Período Letivo</h5>
+                                <p class="mb-0 small text-muted">1 de Agosto de 2025</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Inscreva-se -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="fs-5 mb-0">Receba Atualizações</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Inscreva-se para receber os últimos avisos e editais por e-mail.</p>
+                        <form>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Seu e-mail">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Inscrever-se</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h4 class="fs-5">Universidade Federal</h4>
+                    <p class="text-muted">
+                        Av. Universidade, 123<br>
+                        Cidade, Estado - CEP 12345-678<br>
+                        Telefone: (12) 3456-7890<br>
+                        Email: contato@universidade.edu.br
+                    </p>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h4 class="fs-5">Links Rápidos</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none">Site da Universidade</a></li>
+                        <li><a href="#" class="text-decoration-none">Calendário Acadêmico</a></li>
+                        <li><a href="#" class="text-decoration-none">Departamentos</a></li>
+                        <li><a href="#" class="text-decoration-none">Biblioteca</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h4 class="fs-5">Recursos</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none">Portal do Aluno</a></li>
+                        <li><a href="#" class="text-decoration-none">Portal do Professor</a></li>
+                        <li><a href="#" class="text-decoration-none">Pesquisa</a></li>
+                        <li><a href="#" class="text-decoration-none">Ex-alunos</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h4 class="fs-5">Redes Sociais</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none"><i class="bi bi-facebook me-2"></i>Facebook</a></li>
+                        <li><a href="#" class="text-decoration-none"><i class="bi bi-twitter me-2"></i>Twitter</a></li>
+                        <li><a href="#" class="text-decoration-none"><i class="bi bi-instagram me-2"></i>Instagram</a></li>
+                        <li><a href="#" class="text-decoration-none"><i class="bi bi-linkedin me-2"></i>LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-4 pt-4 border-top">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">
+                        &copy; 2025 Universidade Federal. Todos os direitos reservados.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
