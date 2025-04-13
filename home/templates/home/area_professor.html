@@ -1,200 +1,364 @@
 
 {% block content %}
-<div class="container py-5">
-    <!-- Cabeçalho -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="mb-0">Área do Professor</h1>
-            <p class="text-muted mb-0">Bem-vindo, {{ perfil.usuario.get_full_name }}</p>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Professor - Sistema de Seleção de Mestrado UERN</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        .professor-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            background-color: #00509d !important;
+            color: white;
+            border-bottom: none;
+            padding: 1rem 1.5rem;
+        }
+        .btn-primary {
+            background-color: #00509d;
+            border-color: #00509d;
+        }
+        .btn-primary:hover {
+            background-color: #003b73;
+            border-color: #003b73;
+        }
+        .btn-outline-primary {
+            color: #00509d;
+            border-color: #00509d;
+        }
+        .btn-outline-primary:hover {
+            background-color: #00509d;
+            color: white;
+        }
+        .badge.bg-primary {
+            background-color: #00509d !important;
+        }
+        .badge.bg-success {
+            background-color: #198754 !important;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            font-weight: 600;
+            color: #495057;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        .section-title {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        .info-item {
+            margin-bottom: 0.5rem;
+        }
+        .info-label {
+            font-weight: 600;
+        }
+        .modal-header {
+            background-color: #00509d;
+            color: white;
+        }
+        .analysis-result {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-line;
+        }
+        .btn-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-outline-success {
+            color: #198754;
+            border-color: #d1e7dd;
+        }
+        .btn-outline-success:hover {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border-color: #d1e7dd;
+        }
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #f8d7da;
+        }
+        .btn-outline-danger:hover {
+            background-color: #f8d7da;
+            color: #842029;
+            border-color: #f8d7da;
+        }
+        .btn-outline-info {
+            color: #0dcaf0;
+            border-color: #cff4fc;
+        }
+        .btn-outline-info:hover {
+            background-color: #cff4fc;
+            color: #055160;
+            border-color: #cff4fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4 professor-container">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+            <div>
+                <h1 class="fs-2 fw-bold mb-0">Área do Professor</h1>
+                <p class="text-muted mb-0">Bem-vindo, {{ perfil.usuario.get_full_name }}</p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <a href="{% url 'completar_perfil_professor' %}" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-pencil-square"></i> Editar Perfil
+                </a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+            </div>
         </div>
-        <div>
-            <a href="{% url 'completar_perfil_professor' %}" class="btn btn-outline-primary me-2">
-                <i class="bi bi-pencil-square"></i> Editar Perfil
-            </a>
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
-                <i class="bi bi-box-arrow-right"></i> Sair
-            </a>
-        </div>
-    </div>
 
-    <!-- Seção de Perfil -->
-    <div class="card shadow mb-5">
-        <div class="card-header bg-primary text-white">
-            <h2 class="h5 mb-0"><i class="bi bi-person-badge"></i> Meu Perfil</h2>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <!-- Coluna de Informações Pessoais -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <h3 class="h6 text-muted">Informações Pessoais</h3>
-                        <hr class="mt-1">
-                        <p><strong>Nome:</strong> {{ perfil.usuario.get_full_name }}</p>
-                        <p><strong>Email:</strong> {{ perfil.usuario.email }}</p>
-                        <p><strong>CPF:</strong> {{ perfil.usuario.cpf|slice:":3" }}.{{ perfil.usuario.cpf|slice:"3:6" }}.{{ perfil.usuario.cpf|slice:"6:9" }}-{{ perfil.usuario.cpf|slice:"9:11" }}</p>
+        <!-- Profile Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0 d-flex align-items-center">
+                    <i class="bi bi-person-badge me-2"></i> Meu Perfil
+                </h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <!-- Personal Information -->
+                    <div class="col-md-6">
+                        <h3 class="section-title">Informações Pessoais</h3>
+                        <hr class="mt-1 mb-3">
+                        <div class="info-item">
+                            <span class="info-label">Nome:</span> {{ perfil.usuario.get_full_name }}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email:</span> {{ perfil.usuario.email }}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">CPF:</span> {{ perfil.usuario.cpf|slice:":3" }}.{{ perfil.usuario.cpf|slice:"3:6" }}.{{ perfil.usuario.cpf|slice:"6:9" }}-{{ perfil.usuario.cpf|slice:"9:11" }}
+                        </div>
                     </div>
-                </div>
 
-                <!-- Coluna de Informações Acadêmicas -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <h3 class="h6 text-muted">Informações Acadêmicas</h3>
-                        <hr class="mt-1">
-                        <p><strong>Departamento:</strong> {{ perfil.departamento }}</p>
-                        <p><strong>Área de Atuação:</strong> {{ perfil.area_atuacao|default:"Não informado" }}</p>
-                        <p><strong>Lattes:</strong> 
+                    <!-- Academic Information -->
+                    <div class="col-md-6">
+                        <h3 class="section-title">Informações Acadêmicas</h3>
+                        <hr class="mt-1 mb-3">
+                        <div class="info-item">
+                            <span class="info-label">Departamento:</span> {{ perfil.departamento }}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Área de Atuação:</span> {{ perfil.area_atuacao|default:"Não informado" }}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Lattes:</span> 
                             {% if perfil.lattes %}
-                                <a href="{{ perfil.lattes }}" target="_blank">Ver Currículo</a>
+                                <a href="{{ perfil.lattes }}" target="_blank" class="text-primary">Ver Currículo</a>
                             {% else %}
                                 Não informado
                             {% endif %}
-                        </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Seção de Seleções Ativas -->
-    <div class="card shadow mb-5">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0"><i class="bi bi-list-task"></i> Minhas Seleções Ativas</h2>
-            <a href="{% url 'listar_editais' %}" class="btn btn-sm btn-light">
-                <i class="bi bi-plus-circle"></i> Nova Seleção
-            </a>
-        </div>
-        <div class="card-body">
-            {% if selecoes %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Edital</th>
-                                <th>Período</th>
-                                <th>Vagas</th>
-                                <th>Inscrições</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for selecao in selecoes %}
-                            <tr>
-                                <td>{{ selecao.edital.titulo|truncatechars:30 }}</td>
-                                <td>
-                                    {{ selecao.data_inicio|date:"d/m/Y" }} - 
-                                    {{ selecao.data_fim|date:"d/m/Y" }}
-                                </td>
-                                <td>{{ selecao.vagas }}</td>
-                                <td>
-                                    <span class="badge bg-primary rounded-pill">
-                                        {{ selecao.inscricoes.count }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {% if selecao.data_fim < now %}
-                                        <span class="badge bg-secondary">Encerrada</span>
-                                    {% else %}
-                                        <span class="badge bg-success">Ativa</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-outline-primary" title="Detalhes">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-outline-success" title="Avaliar Inscrições">
-                                            <i class="bi bi-people"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    Você não possui seleções ativas no momento.
-                    <a href="{% url 'listar_editais' %}" class="alert-link">Clique aqui para criar uma nova seleção</a>.
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Seção de Inscrições Pendentes -->
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h2 class="h5 mb-0"><i class="bi bi-hourglass-split"></i> Inscrições Pendentes de Avaliação</h2>
-        </div>
-        <div class="card-body">
-            {% if inscricoes_pendentes %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th>Seleção</th>
-                                <th>Data</th>
-                                <th>Documento</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for inscricao in inscricoes_pendentes %}
-                            <tr>
-                                <td>{{ inscricao.aluno.get_full_name }}</td>
-                                <td>{{ inscricao.selecao.edital.titulo|truncatechars:25 }}</td>
-                                <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
-                                <td>
-                                    <a href="{{ inscricao.documento.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-file-earmark-text"></i> Visualizar
-                                    </a>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=aprovada" class="btn btn-outline-success" title="Aprovar">
-                                            <i class="bi bi-check-circle"></i>
-                                        </a>
-                                        <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=reprovada" class="btn btn-outline-danger" title="Reprovar">
-                                            <i class="bi bi-x-circle"></i>
-                                        </a>
-                                        <button class="btn btn-outline-info" title="Analisar com IA" onclick="analisarDocumento({{ inscricao.id }})">
-                                            <i class="bi bi-robot"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="alert alert-success">
-                    Nenhuma inscrição pendente de avaliação no momento.
-                </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Análise IA -->
-<div class="modal fade" id="analiseModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Análise de Documento</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Active Selections Section -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0 d-flex align-items-center">
+                    <i class="bi bi-list-task me-2"></i> Minhas Seleções Ativas
+                </h2>
+                <a href="{% url 'listar_editais' %}" class="btn btn-sm btn-light d-flex align-items-center">
+                    <i class="bi bi-plus-circle me-1"></i> Nova Seleção
+                </a>
             </div>
-            <div class="modal-body" id="analiseResult">
-                <!-- Resultado da análise será inserido aqui -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <div class="card-body p-0">
+                {% if selecoes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Edital</th>
+                                    <th>Período</th>
+                                    <th>Vagas</th>
+                                    <th>Inscrições</th>
+                                    <th>Status</th>
+                                    <th class="pe-4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for selecao in selecoes %}
+                                <tr>
+                                    <td class="ps-4">{{ selecao.edital.titulo|truncatechars:30 }}</td>
+                                    <td>
+                                        {{ selecao.data_inicio|date:"d/m/Y" }} - 
+                                        {{ selecao.data_fim|date:"d/m/Y" }}
+                                    </td>
+                                    <td>{{ selecao.vagas }}</td>
+                                    <td>
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ selecao.inscricoes.count }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if selecao.data_fim < now %}
+                                            <span class="badge bg-secondary">Encerrada</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Ativa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-outline-primary btn-icon" title="Detalhes">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="#" class="btn btn-outline-success btn-icon" title="Avaliar Inscrições">
+                                                <i class="bi bi-people"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info m-4">
+                        Você não possui seleções ativas no momento.
+                        <a href="{% url 'listar_editais' %}" class="alert-link">Clique aqui para criar uma nova seleção</a>.
+                    </div>
+                {% endif %}
             </div>
         </div>
+
+        <!-- Pending Registrations Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0 d-flex align-items-center">
+                    <i class="bi bi-hourglass-split me-2"></i> Inscrições Pendentes de Avaliação
+                </h2>
+            </div>
+            <div class="card-body p-0">
+                {% if inscricoes_pendentes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Aluno</th>
+                                    <th>Seleção</th>
+                                    <th>Data</th>
+                                    <th>Documento</th>
+                                    <th class="pe-4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inscricao in inscricoes_pendentes %}
+                                <tr>
+                                    <td class="ps-4">{{ inscricao.aluno.get_full_name }}</td>
+                                    <td>{{ inscricao.selecao.edital.titulo|truncatechars:25 }}</td>
+                                    <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <a href="{{ inscricao.documento.url }}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center">
+                                            <i class="bi bi-file-earmark-text me-1"></i> Visualizar
+                                        </a>
+                                    </td>
+                                    <td class="pe-4">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=aprovada" class="btn btn-outline-success btn-icon" title="Aprovar">
+                                                <i class="bi bi-check-circle"></i>
+                                            </a>
+                                            <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=reprovada" class="btn btn-outline-danger btn-icon" title="Reprovar">
+                                                <i class="bi bi-x-circle"></i>
+                                            </a>
+                                            <button class="btn btn-outline-info btn-icon" title="Analisar com IA" onclick="analisarDocumento({{ inscricao.id }})">
+                                                <i class="bi bi-robot"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success m-4">
+                        Nenhuma inscrição pendente de avaliação no momento.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="mb-1">Universidade Estadual do Rio Grande do Norte</p>
+            <p class="mb-0">Programa de Pós-Graduação</p>
+        </div>
     </div>
-</div>
+
+    <!-- Modal para Análise IA -->
+    <div class="modal fade" id="analiseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="bi bi-robot me-2"></i> Análise de Documento
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="analysis-result" id="analiseResult">
+                        <!-- Resultado da análise será inserido aqui -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
+</body>
+</html>
 
 {% endblock %}
 

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mestrado',  
         'USER': 'postgres',    
-        'PASSWORD': '0000',  
+        'PASSWORD': '1234',  
         'HOST': 'localhost', 
         'PORT': '5432',   
     }
