@@ -392,3 +392,9 @@ def alterar_tipo_usuario(request, usuario_id):
         return redirect('administrar_usuarios')
     
     return render(request, 'home/admin/alterar_tipo.html', {'usuario': usuario})
+
+def dashboard(request):
+    return render(request, 'home/pagina_edital.html')
+
+def blog(request):
+    return render(request, 'home/blog.html')

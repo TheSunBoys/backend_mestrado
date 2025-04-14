@@ -14,6 +14,9 @@ urlpatterns = [
     path('professor/', views.area_professor, name='area_professor'),
     path('analisar-documentos/', views.analisar_documentos, name='analisar_documentos'),
     
+
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('blog/', views.blog, name='blog'),
     # Perfis
     path('completar-perfil/aluno/', views.completar_perfil_aluno, name='completar_perfil_aluno'),
     path('completar-perfil/professor/', views.completar_perfil_professor, name='completar_perfil_professor'),

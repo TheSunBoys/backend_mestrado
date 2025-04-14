@@ -7,5 +7,5 @@ psycopg
 psycopg2
 psycopg2-binary
 google-genai==1.7.0
-
+django-widget-tweaks
 
