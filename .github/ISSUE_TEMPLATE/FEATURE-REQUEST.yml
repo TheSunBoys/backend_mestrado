@@ -36,7 +36,7 @@ body:
       description: Forneça uma breve explicação da funcionalidade
       placeholder: Descreva em algumas linhas sua solicitação de funcionalidade
     validations:
-      required: true
+      required: false
   - type: textarea
     id: basic_example
     attributes:
@@ -44,7 +44,7 @@ body:
       description: Indique aqui alguns exemplos básicos de sua funcionalidade
       placeholder: Algumas palavras específicas sobre sua solicitação de funcionalidade
     validations:
-      required: true
+      required: false
   - type: textarea
     id: drawbacks
     attributes:
@@ -52,7 +52,7 @@ body:
       description: Quais são as desvantagens/impactos de sua solicitação de funcionalidade?
       placeholder: Identifique as desvantagens e impactos de forma neutra em sua solicitação de funcionalidade
     validations:
-      required: true
+      required: false
   - type: textarea
     id: unresolved_question
     attributes:
