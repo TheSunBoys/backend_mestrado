@@ -5,30 +5,6 @@ labels: [
   "pergunta"
 ]
 body:
-  - type: input
-    id: start_date
-    attributes:
-      label: "Data de Início"
-      description: Início do desenvolvimento
-      placeholder: "mês/dia/ano"
-    validations:
-      required: false
-  - type: textarea
-    id: implementation_pr
-    attributes:
-      label: "PR de Implementação"
-      description: Pull request utilizado
-      placeholder: "#ID do Pull Request"
-    validations:
-      required: false
-  - type: textarea
-    id: reference_issues
-    attributes:
-      label: "Issues de Referência"
-      description: Problemas comuns
-      placeholder: "#IDs dos Issues"
-    validations:
-      required: false
   - type: textarea
     id: summary
     attributes:
@@ -36,29 +12,4 @@ body:
       description: Forneça uma breve explicação da funcionalidade
       placeholder: Descreva em algumas linhas sua solicitação de funcionalidade
     validations:
-      required: true
-  - type: textarea
-    id: basic_example
-    attributes:
-      label: "Exemplo Básico"
-      description: Indique aqui alguns exemplos básicos de sua funcionalidade
-      placeholder: Algumas palavras específicas sobre sua solicitação de funcionalidade
-    validations:
-      required: true
-  - type: textarea
-    id: drawbacks
-    attributes:
-      label: "Desvantagens"
-      description: Quais são as desvantagens/impactos de sua solicitação de funcionalidade?
-      placeholder: Identifique as desvantagens e impactos de forma neutra em sua solicitação de funcionalidade
-    validations:
-      required: true
-  - type: textarea
-    id: unresolved_question
-    attributes:
-      label: "Questões não resolvidas"
-      description: Quais questões ainda permanecem sem resposta?
-      placeholder: Identifique quaisquer questões não resolvidas
-    validations:
       required: false
-
