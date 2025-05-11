@@ -24,7 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
     
-    # Adicione estas linhas para as views de autenticação
     path('registro/', auth_views.LoginView.as_view(template_name='home/registro.html'), name='registro'),
     path('login/', auth_views.LoginView.as_view(template_name='home/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

@@ -9,13 +9,11 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     
     # Dashboard e áreas
-    path('', views.home, name='home'),
+    path('', views.dashboard, name='home'),
     path('aluno/', views.area_aluno, name='area_aluno'),
     path('professor/', views.area_professor, name='area_professor'),
     path('analisar-documentos/', views.analisar_documentos, name='analisar_documentos'),
     
-
-    path('dashboard/', views.dashboard, name='dashboard'),
     path('blog/', views.blog, name='blog'),
     # Perfis
     path('completar-perfil/aluno/', views.completar_perfil_aluno, name='completar_perfil_aluno'),
