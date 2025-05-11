@@ -306,7 +306,7 @@
                                             <a href="{% url 'avaliar_inscricao' inscricao.id %}?status=reprovada" class="btn btn-outline-danger btn-icon" title="Reprovar">
                                                 <i class="bi bi-x-circle"></i>
                                             </a>
-                                            <button class="btn btn-outline-info btn-icon" title="Analisar com IA" onclick="analisarDocumento({{ inscricao.id }})">
+                                            <button class="btn btn-outline-info btn-icon" title="Analisar com IA" onclick="analisarDocumento({ inscricao,id })">
                                                 <i class="bi bi-robot"></i>
                                             </button>
                                         </div>
