@@ -39,15 +39,13 @@
             background-color: #003b73;
             border-color: #003b73;
         }
-        .table {
-            margin-bottom: 0;
+        .btn-outline-primary {
+            color: #00509d;
+            border-color: #00509d;
         }
-        .table th {
-            font-weight: 600;
-            color: #495057;
-        }
-        .table td {
-            vertical-align: middle;
+        .btn-outline-primary:hover {
+            background-color: #00509d;
+            color: white;
         }
         .badge.bg-success {
             background-color: #198754 !important;
@@ -106,6 +104,42 @@
     </style>
 </head>
 <body>
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Sistema de Seleção</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_editais' %}">Editais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link text-white">Sair</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
     <div class="container py-4 edital-container">
         <!-- Header -->
         <div class="mb-4">
@@ -118,6 +152,9 @@
                 {% endif %}
                 <a href="{{ edital.arquivo.url }}" download class="btn btn-outline-primary d-inline-flex align-items-center">
                     <i class="bi bi-download me-2"></i> Baixar PDF
+                </a>
+                <a href="{% url 'editar_edital' edital.id %}" class="btn btn-outline-primary d-inline-flex align-items-center">
+                    <i class="bi bi-pencil me-2"></i> Editar Edital
                 </a>
             </div>
         </div>

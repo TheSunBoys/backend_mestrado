@@ -1,44 +1,93 @@
 {% load inscricao_tags %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscrição em Seleção</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Inscrição em Seleção</h1>
-    <h2>{{ selecao.edital.titulo }}</h2>
-    
-    <!-- Verificação simplificada -->
-    <!-- and selecao.data_inicio <= now and selecao.data_fim >= now -->
-    {% with ja_inscrito=user.inscricoes.all|has_selecao:selecao %}
-    {% if not ja_inscrito %}
-    
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <div>
-            <label>Documento (PDF)*</label>
-            <input type="file" name="documento" accept=".pdf" required>
-            {% if form.documento.errors %}
-                <p style="color:red">{{ form.documento.errors.0 }}</p>
-            {% endif %}
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Sistema de Seleção</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_editais' %}">Editais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link text-white">Sair</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-        
-        <div>
-            <label>Observações</label>
-            <textarea name="observacao">{{ form.observacao.value|default:'' }}</textarea>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container py-5">
+        <h1 class="mb-4">Inscrição em Seleção</h1>
+        <h2 class="mb-4">{{ selecao.edital.titulo }}</h2>
+
+        {% with ja_inscrito=user.inscricoes.all|has_selecao:selecao %}
+        {% if not ja_inscrito %}
+        <form method="post" enctype="multipart/form-data" class="card p-4 shadow">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="documento" class="form-label">Documento (PDF)*</label>
+                <input type="file" class="form-control" id="documento" name="documento" accept=".pdf" required>
+                {% if form.documento.errors %}
+                    <div class="text-danger mt-1">{{ form.documento.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="observacao" class="form-label">Observações</label>
+                <textarea class="form-control" id="observacao" name="observacao" rows="3">{{ form.observacao.value|default:'' }}</textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Confirmar Inscrição</button>
+            </div>
+        </form>
+        {% else %}
+        <div class="alert alert-warning mt-4">
+            Você já está inscrito nesta seleção ou o período de inscrições está encerrado.
         </div>
-        
-        <div>
-            <a href="{% url 'detalhes_selecao' selecao.id %}">Cancelar</a>
-            <button type="submit">Confirmar Inscrição</button>
+        <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-primary mt-3">Voltar</a>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="bg-light py-4 mt-5 border-top">
+        <div class="container text-center">
+            <p class="mb-0 text-muted">&copy; 2025 Sistema de Seleção. Todos os direitos reservados.</p>
         </div>
-    </form>
-    
-    {% else %}
-        <p>Você já está inscrito nesta seleção ou o período de inscrições está encerrado.</p>
-        <a href="{% url 'detalhes_selecao' selecao.id %}">Voltar</a>
-    {% endif %}
-    {% endwith %}
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
