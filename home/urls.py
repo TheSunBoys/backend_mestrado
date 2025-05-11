@@ -31,7 +31,10 @@ urlpatterns = [
     path('selecoes/<int:pk>/', views.detalhes_selecao, name='detalhes_selecao'),
     path('selecoes/<int:pk>/inscrever/', views.inscrever_selecao, name='inscrever_selecao'),
     path('selecoes/<int:pk>/editar/', views.editar_selecao, name='editar_selecao'),
+
+
     
+    path('avaliar-inscricao/<int:inscricao_id>/', views.avaliar_inscricao, name='avaliar_inscricao'),
     # Admin
     path('admin/usuarios/', views.administrar_usuarios, name='administrar_usuarios'),
 ]
