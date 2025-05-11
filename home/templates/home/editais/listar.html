@@ -57,30 +57,6 @@
             background-color: #003b73;
             border-color: #003b73;
         }
-        .table {
-            margin-bottom: 0;
-        }
-        .table th {
-            font-weight: 600;
-            color: #495057;
-        }
-        .table td {
-            vertical-align: middle;
-        }
-        .badge.bg-success {
-            background-color: #198754 !important;
-        }
-        .badge.bg-secondary {
-            background-color: #6c757d !important;
-        }
-        .footer {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #dee2e6;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #6c757d;
-        }
         .btn-action {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
@@ -113,6 +89,22 @@
         .btn-delete:hover {
             background-color: #f8d7da;
             color: #dc3545;
+        }
+        .btn-select {
+            color: #0dcaf0;
+            border-color: #cff4fc;
+        }
+        .btn-select:hover {
+            background-color: #cff4fc;
+            color: #0dcaf0;
+        }
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -200,7 +192,7 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th class="ps-4" style="width: 40%">Título</th>
+                                <th class="ps-4" style="width: 35%">Título</th>
                                 <th>Publicação</th>
                                 <th>Status</th>
                                 <th>Criado por</th>
@@ -222,15 +214,21 @@
                                 <td>{{ edital.criado_por.get_full_name }}</td>
                                 <td class="pe-4">
                                     <div class="btn-group-action">
+                                        <!-- Ver Edital -->
                                         <a href="{% url 'exibir_edital' edital.id %}" class="btn btn-outline-primary btn-action btn-view" title="Ver">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        <!-- Editar/Excluir -->
                                         {% if user == edital.criado_por or user.is_superuser %}
                                         <a href="{% url 'editar_edital' edital.id %}" class="btn btn-outline-success btn-action btn-edit" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <a href="{% url 'excluir_edital' edital.id %}" class="btn btn-outline-danger btn-action btn-delete" title="Excluir">
                                             <i class="bi bi-trash"></i>
+                                        </a>
+                                        <!-- Nova Seleção -->
+                                        <a href="{% url 'criar_selecao' edital.id %}" class="btn btn-outline-info btn-action btn-select" title="Nova Seleção">
+                                            <i class="bi bi-clipboard-plus"></i>
                                         </a>
                                         {% endif %}
                                     </div>
