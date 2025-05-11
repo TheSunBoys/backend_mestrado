@@ -20,10 +20,14 @@
                         <a class="nav-link" href="{% url 'listar_editais' %}">Editais</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                        {% if user.tipo_usuario == 'aluno' %}
+                            <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                        {% endif %}
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                        {% if user.tipo_usuario == 'professor' %}
+                            <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                        {% endif %}
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -86,7 +90,15 @@
                         <tr>
                             <td>{{ inscricao.aluno.get_full_name }}</td>
                             <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
-                            <td>{{ inscricao.get_status_display }}</td>
+                            <td>
+                                {% if inscricao.status == 'aprovada' %}
+                                    <span class="badge bg-success">Aprovada</span>
+                                {% elif inscricao.status == 'reprovada' %}
+                                    <span class="badge bg-danger">Reprovada</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pendente</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>
                                 {% if user.tipo_usuario == 'professor' %}
@@ -104,8 +116,17 @@
         </div>
 
         <div class="d-flex gap-2">
-            <a href="{% url 'inscrever_selecao' selecao.id %}" class="btn btn-primary">Inscrever-se</a>
+            {% if user.tipo_usuario == 'professor' %}
+                <a href="{% url 'editar_selecao' selecao.id %}" class="btn btn-secondary">Editar Seleção</a>
+            {% endif %}
+            <!-- filepath: c:\Users\Windows\Documents\Sistema de Estoque e Caixa\backend_mestrado\home\templates\home\selecoes\exibir.html -->
+            {% if pode_inscrever %}
+                <a href="{% url 'inscrever_selecao' selecao.id %}" class="btn btn-primary">Inscrever-se</a>
+            {% endif %}
             <a href="{% url 'exibir_edital' selecao.edital.id %}" class="btn btn-secondary">Voltar para Edital</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Voltar para o Início</a>
+
+
         </div>
     </div>
 
