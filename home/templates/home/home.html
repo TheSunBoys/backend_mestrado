@@ -6,7 +6,9 @@
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
             <h1 class="display-4">Dashboard</h1>
+            
             <p class="lead text-muted">Bem-vindo, {{ user.get_full_name|default:user.username }}</p>
+
         </div>
         <div>
             <a href="{% url 'logout' %}" class="btn btn-outline-danger">

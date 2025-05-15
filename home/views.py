@@ -269,6 +269,7 @@ def detalhes_selecao(request, pk):
     return render(request, 'home/selecoes/exibir.html', {
         'selecao': selecao,
         'inscricoes': inscricoes,
+        'ja_inscrito': inscricoes.filter(aluno=request.user).exists(),
         'pode_inscrever': pode_inscrever,
         'now': timezone.now()
     })
@@ -399,3 +400,4 @@ def dashboard(request):
 
 def blog(request):
     return render(request, 'home/blog.html')
+

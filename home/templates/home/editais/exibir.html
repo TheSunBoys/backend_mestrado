@@ -117,10 +117,14 @@
                         <a class="nav-link" href="{% url 'listar_editais' %}">Editais</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                        {% if user.tipo_usuario == 'aluno' %}
+                            <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                        {% endif %}
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                        {% if user.tipo_usuario == 'professor' %}
+                            <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                        {% endif %}
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -153,9 +157,13 @@
                 <a href="{{ edital.arquivo.url }}" download class="btn btn-outline-primary d-inline-flex align-items-center">
                     <i class="bi bi-download me-2"></i> Baixar PDF
                 </a>
-                <a href="{% url 'editar_edital' edital.id %}" class="btn btn-outline-primary d-inline-flex align-items-center">
-                    <i class="bi bi-pencil me-2"></i> Editar Edital
-                </a>
+                {% if user.tipo_usuario == 'professor' %}
+                    <a href="{% url 'editar_edital' edital.id %}" class="btn btn-outline-primary d-inline-flex align-items-center">
+    
+                        <i class="bi bi-pencil me-2"></i> Editar Edital
+                         
+                    </a>
+                {% endif %}    
             </div>
         </div>
 
