@@ -76,6 +76,41 @@ class Edital(models.Model):
     
     def __str__(self):
         return self.titulo
+    
+class Fase(models.Model):
+    nome = models.CharField(max_length=100)
+    descricao = models.TextField(blank=True)
+    ordem = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.ordem}ª Fase - {self.nome}"
+
+class CampoFase(models.Model):
+    TIPO_CAMPO_CHOICES = [
+        ('texto', 'Texto'),
+        ('numero', 'Número'),
+        ('data', 'Data'),
+        ('arquivo', 'Arquivo'),
+    ]
+    fase = models.ForeignKey(Fase, on_delete=models.CASCADE, related_name='campos')
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=20, choices=TIPO_CAMPO_CHOICES)
+    obrigatorio = models.BooleanField(default=False)
+    ordem = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.nome} ({self.get_tipo_display()})"
+
+class ValorCampoFase(models.Model):
+    campo = models.ForeignKey(CampoFase, on_delete=models.CASCADE, related_name='valores')
+    inscricao = models.ForeignKey('Inscricao', on_delete=models.CASCADE, related_name='valores_campos')
+    valor_texto = models.TextField(blank=True, null=True)
+    valor_numero = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    valor_data = models.DateField(blank=True, null=True)
+    valor_arquivo = models.FileField(upload_to='fases/campos/', blank=True, null=True)
+
+    def __str__(self):
+        return f"Valor para {self.campo.nome} (Inscrição {self.inscricao.id})"
 
 class Selecao(models.Model):
     edital = models.ForeignKey(Edital, on_delete=models.CASCADE, related_name='selecoes')
@@ -83,15 +118,18 @@ class Selecao(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='selecoes_responsavel',
-        limit_choices_to={'tipo_usuario': 'professor'}
+        limit_choices_to={'tipo_usuario': 'professor'},
     )
     data_inicio = models.DateTimeField()
     data_fim = models.DateTimeField()
     vagas = models.PositiveIntegerField(default=1)
-    
+
+    fases = models.ManyToManyField(Fase, related_name='selecoes')
+    quantidade_de_fases = models.IntegerField(default=1)
+ 
     def __str__(self):
         return f"Seleção {self.edital.titulo}"
-
+    
 class Inscricao(models.Model):
     STATUS_CHOICES = [
         ('pendente', 'Pendente'),
