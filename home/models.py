@@ -126,8 +126,14 @@ class Selecao(models.Model):
         related_name='selecoes_responsavel',
         limit_choices_to={'tipo_usuario': 'professor'},
     )
-    data_inicio = models.DateTimeField()
-    data_fim = models.DateTimeField()
+    data_inicio = models.DateTimeField(
+        default="2001-09-10 00:00:00",
+        help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
+    )
+    data_fim = models.DateTimeField(
+        default="2001-09-11 00:00:00",
+        help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
+    )
     vagas = models.PositiveIntegerField(default=1)
     quantidade_fases = models.PositiveIntegerField(
         default=1,
@@ -153,13 +159,21 @@ class Fase(models.Model):
     selecao = models.ForeignKey(
         Selecao, 
         on_delete=models.CASCADE, 
-        related_name='fases_selecao'
+        related_name='fases_selecao',
+        null=True,
+        blank=True
     )
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
     ordem = models.PositiveIntegerField(default=1)
-    data_inicio = models.DateTimeField()
-    data_fim = models.DateTimeField()
+    data_inicio = models.DateTimeField(
+        default="2001-09-10 00:00:00",
+        help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
+    )
+    data_fim = models.DateTimeField(
+        default="2001-09-11 00:00:00",
+        help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
+    )
     peso = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
