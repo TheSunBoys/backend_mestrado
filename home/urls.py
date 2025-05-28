@@ -32,7 +32,7 @@ urlpatterns = [
     path('selecoes/<int:pk>/inscrever/', views.inscrever_selecao, name='inscrever_selecao'),
     path('selecoes/<int:pk>/editar/', views.editar_selecao, name='editar_selecao'),
 
-
+    path('get-fase-form/', views.get_fase_form, name='get_fase_form'),
     
     path('avaliar-inscricao/<int:inscricao_id>/', views.avaliar_inscricao, name='avaliar_inscricao'),
     # Admin

@@ -13,6 +13,7 @@ from .forms import (
     EditalForm, 
     InscricaoForm,
     SelecaoForm,
+    FaseForm,
 )
 import json
 from google import genai
@@ -207,27 +208,47 @@ def excluir_edital(request, pk):
 # --- Views de Seleção ---
 @login_required
 @user_passes_test(is_professor)
+
 def criar_selecao(request, edital_id):
     """Cria uma seleção associada a um edital"""
     edital = get_object_or_404(Edital, pk=edital_id)
-    print(edital_id)
+    
     if request.method == 'POST':
+        logger.info("Dados recebidos no POST: %s", request.POST)
         form = SelecaoForm(request.POST)
-        if form.is_valid():
+        fase_forms = [FaseForm(request.POST, prefix=str(x)) for x in range(int(request.POST.get('quantidade_fases', 0)))]
+        
+        if form.is_valid() and all(f.is_valid() for f in fase_forms):
             selecao = form.save(commit=False)
             selecao.edital = edital
             selecao.professor_responsavel = request.user
             selecao.save()
 
+            for i, fase_form in enumerate(fase_forms):
+                fase = fase_form.save(commit=False)
+                fase.selecao = selecao
+                fase.ordem = i + 1
+                fase.save()
+                logger.info("Fase criada: %s", fase)
+
             messages.success(request, 'Seleção criada com sucesso!')
             return redirect('exibir_edital', pk=edital.id)
     else:
         form = SelecaoForm()
-    
+        fase_forms = []
+
     return render(request, 'home/selecoes/criar.html', {
         'form': form,
+        'fase_forms': fase_forms,
         'edital': edital
     })
+
+def get_fase_form(request):
+    """Retorna um formulário de fase para ser usado com HTMX"""
+    quantidade_fases = int(request.GET.get('quantidade_fases', 1))
+    logger.info("Quantidade de fases solicitadas: %d", quantidade_fases)
+    fase_forms = [FaseForm(prefix=str(x)) for x in range(quantidade_fases)]
+    return render(request, 'home/templates/home/selecoes/fase_form.html', {'fase_forms': fase_forms})
 
 @login_required
 @user_passes_test(is_professor)
