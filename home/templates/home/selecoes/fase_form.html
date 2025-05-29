@@ -1,0 +1,57 @@
+{% load widget_tweaks %}
+
+{% for fase_form in fase_forms %}
+<div class="fase-card">
+    <div class="fase-header">
+        <h3 class="fase-title">Fase {{ forloop.counter }}</h3>
+    </div>
+    
+    <!-- Nome da Fase -->
+    <div class="mb-3">
+        <label for="{{ fase_form.nome.id_for_label }}" class="form-label">
+            Nome da Fase<span class="required-asterisk">*</span>
+        </label>
+        {{ fase_form.nome|add_class:"form-control"|add_error_class:"is-invalid" }}
+    </div>
+    
+    <!-- Descrição -->
+    <div class="mb-3">
+        <label for="{{ fase_form.descricao.id_for_label }}" class="form-label">
+            Descrição
+        </label>
+        {{ fase_form.descricao|add_class:"form-control"|add_error_class:"is-invalid" }}
+    </div>
+    
+    <!-- Tipo de Fase -->
+    <div class="mb-3">
+        <label for="{{ fase_form.tipo_fase.id_for_label }}" class="form-label">
+            Tipo de Fase<span class="required-asterisk">*</span>
+        </label>
+        {{ fase_form.tipo_fase|add_class:"form-select"|add_error_class:"is-invalid" }}
+    </div>
+    
+    <!-- Data de Início -->
+    <div class="mb-3">
+        <label for="{{ fase_form.data_inicio.id_for_label }}" class="form-label">
+            Data de Início<span class="required-asterisk">*</span>
+        </label>
+        {{ fase_form.data_inicio|add_class:"form-control"|add_error_class:"is-invalid" }}
+    </div>
+    
+    <!-- Data de Término -->
+    <div class="mb-3">
+        <label for="{{ fase_form.data_fim.id_for_label }}" class="form-label">
+            Data de Término<span class="required-asterisk">*</span>
+        </label>
+        {{ fase_form.data_fim|add_class:"form-control"|add_error_class:"is-invalid" }}
+    </div>
+    
+    <!-- Peso -->
+    <div class="mb-3">
+        <label for="{{ fase_form.peso.id_for_label }}" class="form-label">
+            Peso (0-1)<span class="required-asterisk">*</span>
+        </label>
+        {{ fase_form.peso|add_class:"form-control"|add_error_class:"is-invalid" }}
+    </div>
+</div>
+{% endfor %}
