@@ -157,17 +157,11 @@ class Selecao(models.Model):
 
 class Fase(models.Model):
     selecao = models.ForeignKey(
-<<<<<<< HEAD
-        Selecao, 
-        on_delete=models.CASCADE, 
+        Selecao,
+        on_delete=models.CASCADE,
         related_name='fases_selecao',
         null=True,
         blank=True
-=======
-        Selecao,
-        on_delete=models.CASCADE,
-        related_name='fases_selecao'
->>>>>>> e7329a8 (ajustando os conflitos)
     )
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
