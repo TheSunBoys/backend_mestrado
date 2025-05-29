@@ -208,35 +208,61 @@ def excluir_edital(request, pk):
 # --- Views de Seleção ---
 @login_required
 @user_passes_test(is_professor)
-
 def criar_selecao(request, edital_id):
     """Cria uma seleção associada a um edital"""
+    print("Iniciando a criação de seleção...")
     edital = get_object_or_404(Edital, pk=edital_id)
-    
+    print(f"Edital encontrado: {edital}")
+
     if request.method == 'POST':
-        logger.info("Dados recebidos no POST: %s", request.POST)
+        print("Método POST recebido.")
         form = SelecaoForm(request.POST)
-        fase_forms = [FaseForm(request.POST, prefix=str(x)) for x in range(int(request.POST.get('quantidade_fases', 0)))]
+        print(f"Dados do formulário de seleção: {form.data}")
+        quantidade_fases = int(request.POST.get('quantidade_fases', 0))
+        print(f"Quantidade de fases recebida: {quantidade_fases}")
         
+        # Corrigido o prefixo dos formulários de fase
+        fase_forms = [FaseForm(request.POST, prefix=f"fase-{x + 1}") for x in range(quantidade_fases)]
+        print(f"Formulários de fases criados: {len(fase_forms)}")
+
+        if form.is_valid():
+            print("Formulário de seleção válido.")
+        else:
+            print(f"Erros no formulário de seleção: {form.errors}")
+
+        if all(f.is_valid() for f in fase_forms):
+            print("Todos os formulários de fases são válidos.")
+        else:
+            for i, fase_form in enumerate(fase_forms):
+                if not fase_form.is_valid():
+                    print(f"Erros no formulário da fase {i + 1}: {fase_form.errors}")
+
         if form.is_valid() and all(f.is_valid() for f in fase_forms):
             selecao = form.save(commit=False)
             selecao.edital = edital
             selecao.professor_responsavel = request.user
             selecao.save()
+            print(f"Seleção criada: {selecao}")
 
             for i, fase_form in enumerate(fase_forms):
                 fase = fase_form.save(commit=False)
                 fase.selecao = selecao
                 fase.ordem = i + 1
                 fase.save()
-                logger.info("Fase criada: %s", fase)
-
+                print(f"Fase {i + 1} criada: {fase}")
+            
             messages.success(request, 'Seleção criada com sucesso!')
+            print("Seleção e fases criadas com sucesso.")
             return redirect('exibir_edital', pk=edital.id)
+        else:
+            print("Erro na validação dos formulários.")
+
     else:
+        print("Método GET recebido.")
         form = SelecaoForm()
         fase_forms = []
 
+    print("Renderizando o template de criação de seleção.")
     return render(request, 'home/selecoes/criar.html', {
         'form': form,
         'fase_forms': fase_forms,
@@ -246,7 +272,6 @@ def criar_selecao(request, edital_id):
 def get_fase_form(request):
     """Retorna um formulário de fase para ser usado com HTMX"""
     quantidade_fases = int(request.GET.get('quantidade_fases', 1))
-    logger.info("Quantidade de fases solicitadas: %d", quantidade_fases)
     fase_forms = [FaseForm(prefix=str(x)) for x in range(quantidade_fases)]
     return render(request, 'home/templates/home/selecoes/fase_form.html', {'fase_forms': fase_forms})
 
