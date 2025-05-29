@@ -10,16 +10,16 @@ class Usuario(AbstractUser):
         ('aluno', 'Aluno'),
         ('admin', 'Administrador'),
     ]
-    
+
     tipo_usuario = models.CharField(max_length=10, choices=TIPO_USUARIO_CHOICES)
     cpf = models.CharField(max_length=11, unique=True)
     telefone = models.CharField(max_length=15, blank=True)
-    
+
     class Meta:
         db_table = 'usuarios'
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
-    
+
     def __str__(self):
         return self.get_full_name() or self.username
 
@@ -36,12 +36,12 @@ class Aluno(models.Model):
     interesse_pesquisa = models.CharField(max_length=255, blank=True)
     genero = models.CharField(max_length=50, blank=True)
     ppi = models.BooleanField(default=False)
-    
+
     class Meta:
         db_table = 'alunos'
         verbose_name = 'Aluno'
         verbose_name_plural = 'Alunos'
-    
+
     def __str__(self):
         return self.usuario.get_full_name()
 
@@ -55,12 +55,12 @@ class Professor(models.Model):
     departamento = models.CharField(max_length=100)
     lattes = models.URLField(blank=True)
     area_atuacao = models.CharField(max_length=255, blank=True)
-    
+
     class Meta:
         db_table = 'professores'
         verbose_name = 'Professor'
         verbose_name_plural = 'Professores'
-    
+
     def __str__(self):
         return f"Prof. {self.usuario.get_full_name()}"
 
@@ -77,17 +77,17 @@ class Edital(models.Model):
     )
     ativo = models.BooleanField(default=True)
     nota_minima_aprovacao = models.DecimalField(
-        max_digits=4, 
+        max_digits=4,
         decimal_places=2,
         default=7.0,
         help_text="Nota mínima para aprovação nas fases (0-10)"
     )
-    
+
     class Meta:
         verbose_name = 'Edital'
         verbose_name_plural = 'Editais'
         ordering = ['-data_publicacao']
-    
+
     def __str__(self):
         return self.titulo
 
@@ -103,21 +103,21 @@ class TipoCampo(models.Model):
         ('booleano', 'Verdadeiro/Falso'),
     ])
     opcoes = models.TextField(
-        blank=True, 
+        blank=True,
         help_text="Para campos de escolha, informe uma opção por linha"
     )
-    
+
     class Meta:
         verbose_name = 'Tipo de Campo'
         verbose_name_plural = 'Tipos de Campo'
-    
+
     def __str__(self):
         return self.nome
 
 class Selecao(models.Model):
     edital = models.ForeignKey(
-        Edital, 
-        on_delete=models.CASCADE, 
+        Edital,
+        on_delete=models.CASCADE,
         related_name='selecoes'
     )
     professor_responsavel = models.ForeignKey(
@@ -139,29 +139,35 @@ class Selecao(models.Model):
         default=1,
         help_text="Número total de fases do processo seletivo"
     )
-    
+
     class Meta:
         verbose_name = 'Seleção'
         verbose_name_plural = 'Seleções'
         ordering = ['-data_inicio']
-    
+
     def __str__(self):
         return f"Seleção {self.edital.titulo}"
-    
+
     def clean(self):
         if self.data_inicio >= self.data_fim:
             raise ValidationError("A data de término deve ser posterior à data de início")
-        
+
         if self.data_inicio < timezone.now():
             raise ValidationError("A data de início não pode ser no passado")
 
 class Fase(models.Model):
     selecao = models.ForeignKey(
+<<<<<<< HEAD
         Selecao, 
         on_delete=models.CASCADE, 
         related_name='fases_selecao',
         null=True,
         blank=True
+=======
+        Selecao,
+        on_delete=models.CASCADE,
+        related_name='fases_selecao'
+>>>>>>> e7329a8 (ajustando os conflitos)
     )
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
@@ -175,8 +181,8 @@ class Fase(models.Model):
         help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
     )
     peso = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2, 
+        max_digits=5,
+        decimal_places=2,
         default=1.0,
         help_text="Peso desta fase na avaliação final (0-1)"
     )
@@ -184,32 +190,32 @@ class Fase(models.Model):
         default=True,
         help_text="Se a fase é obrigatória para aprovação"
     )
-    
+
     class Meta:
         verbose_name = 'Fase'
         verbose_name_plural = 'Fases'
         ordering = ['ordem']
         unique_together = ('selecao', 'ordem')
-    
+
     def __str__(self):
         return f"{self.ordem}ª Fase - {self.nome}"
-    
+
     def clean(self):
         if self.data_inicio >= self.data_fim:
             raise ValidationError("A data de término deve ser posterior à data de início")
-        
+
         # Verifica se as datas estão dentro do período da seleção
         if self.data_inicio < self.selecao.data_inicio or self.data_fim > self.selecao.data_fim:
             raise ValidationError("As datas da fase devem estar dentro do período da seleção")
 
 class CampoFase(models.Model):
     fase = models.ForeignKey(
-        Fase, 
-        on_delete=models.CASCADE, 
+        Fase,
+        on_delete=models.CASCADE,
         related_name='campos'
     )
     tipo = models.ForeignKey(
-        TipoCampo, 
+        TipoCampo,
         on_delete=models.PROTECT,
         related_name='campos_fase'
     )
@@ -218,18 +224,18 @@ class CampoFase(models.Model):
     obrigatorio = models.BooleanField(default=False)
     ordem = models.PositiveIntegerField(default=1)
     peso = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2, 
+        max_digits=5,
+        decimal_places=2,
         default=1.0,
         help_text="Peso deste campo na avaliação da fase"
     )
-    
+
     class Meta:
         verbose_name = 'Campo da Fase'
         verbose_name_plural = 'Campos da Fase'
         ordering = ['ordem']
         unique_together = ('fase', 'ordem')
-    
+
     def __str__(self):
         return f"{self.nome} ({self.tipo.get_tipo_dado_display()})"
 
@@ -239,7 +245,7 @@ class Inscricao(models.Model):
         ('aprovada', 'Aprovada'),
         ('reprovada', 'Reprovada'),
     ]
-    
+
     aluno = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -247,93 +253,93 @@ class Inscricao(models.Model):
         limit_choices_to={'tipo_usuario': 'aluno'}
     )
     selecao = models.ForeignKey(
-        Selecao, 
-        on_delete=models.CASCADE, 
+        Selecao,
+        on_delete=models.CASCADE,
         related_name='inscricoes'
     )
     data_inscricao = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
-        max_length=20, 
-        choices=STATUS_CHOICES, 
+        max_length=20,
+        choices=STATUS_CHOICES,
         default='pendente'
     )
     documento = models.FileField(upload_to='inscricoes/%Y/%m/')
     observacao = models.TextField(blank=True)
     nota_final = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2, 
-        null=True, 
+        max_digits=5,
+        decimal_places=2,
+        null=True,
         blank=True
     )
-    
+
     class Meta:
         verbose_name = 'Inscrição'
         verbose_name_plural = 'Inscrições'
         unique_together = ('aluno', 'selecao')
         ordering = ['-data_inscricao']
-    
+
     def __str__(self):
         return f"Inscrição #{self.id}"
-    
+
     def calcular_nota_final(self):
         """Calcula a nota final baseada nas avaliações das fases"""
         avaliacoes = self.avaliacoes_fases.filter(aprovado=True)
         if not avaliacoes.exists():
             return None
-            
+
         total = 0
         peso_total = 0
-        
+
         for avaliacao in avaliacoes:
             total += avaliacao.nota * avaliacao.fase.peso
             peso_total += avaliacao.fase.peso
-        
+
         self.nota_final = (total / peso_total) if peso_total > 0 else 0
         self.save()
         return self.nota_final
 
 class ValorCampoFase(models.Model):
     campo = models.ForeignKey(
-        CampoFase, 
-        on_delete=models.CASCADE, 
+        CampoFase,
+        on_delete=models.CASCADE,
         related_name='valores'
     )
     inscricao = models.ForeignKey(
-        Inscricao, 
-        on_delete=models.CASCADE, 
+        Inscricao,
+        on_delete=models.CASCADE,
         related_name='valores_campos'
     )
     valor_texto = models.TextField(blank=True, null=True)
     valor_numero = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        blank=True, 
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
         null=True
     )
     valor_data = models.DateField(blank=True, null=True)
     valor_arquivo = models.FileField(
-        upload_to='fases/campos/', 
-        blank=True, 
+        upload_to='fases/campos/',
+        blank=True,
         null=True
     )
     valor_booleano = models.BooleanField(blank=True, null=True)
     avaliacao = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2, 
-        blank=True, 
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
         null=True,
         help_text="Nota atribuída pelo avaliador (0-10)"
     )
     observacao = models.TextField(blank=True)
-    
+
     class Meta:
         verbose_name = 'Valor de Campo'
         verbose_name_plural = 'Valores de Campos'
         unique_together = ('campo', 'inscricao')
-    
+
     def __str__(self):
         return f"Valor para {self.campo.nome} (Inscrição {self.inscricao.id})"
-    
+
     def get_valor(self):
         """Retorna o valor do campo de acordo com seu tipo"""
         tipo = self.campo.tipo.tipo_dado
@@ -353,13 +359,13 @@ class ValorCampoFase(models.Model):
 
 class AvaliacaoFase(models.Model):
     fase = models.ForeignKey(
-        Fase, 
-        on_delete=models.CASCADE, 
+        Fase,
+        on_delete=models.CASCADE,
         related_name='avaliacoes'
     )
     inscricao = models.ForeignKey(
-        Inscricao, 
-        on_delete=models.CASCADE, 
+        Inscricao,
+        on_delete=models.CASCADE,
         related_name='avaliacoes_fases'
     )
     avaliador = models.ForeignKey(
@@ -373,21 +379,21 @@ class AvaliacaoFase(models.Model):
     aprovado = models.BooleanField(default=False)
     observacoes = models.TextField(blank=True)
     data_avaliacao = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = 'Avaliação de Fase'
         verbose_name_plural = 'Avaliações de Fases'
         unique_together = ('fase', 'inscricao', 'avaliador')
         ordering = ['-data_avaliacao']
-    
+
     def __str__(self):
         return f"Avaliação de {self.inscricao.aluno} na fase {self.fase}"
-    
+
     def save(self, *args, **kwargs):
         # Atualiza automaticamente o status da inscrição se todas as fases foram avaliadas
         super().save(*args, **kwargs)
         self.inscricao.calcular_nota_final()
-        
+
         # Verifica se todas as fases obrigatórias foram aprovadas
         fases_obrigatorias = self.inscricao.selecao.fases_selecao.filter(obrigatoria=True)
         avaliacoes_aprovadas = AvaliacaoFase.objects.filter(
@@ -395,10 +401,10 @@ class AvaliacaoFase(models.Model):
             fase__in=fases_obrigatorias,
             aprovado=True
         ).count()
-        
+
         if avaliacoes_aprovadas == fases_obrigatorias.count():
             self.inscricao.status = 'aprovada'
         elif self.inscricao.nota_final is not None:
             self.inscricao.status = 'reprovada'
-        
+
         self.inscricao.save()
