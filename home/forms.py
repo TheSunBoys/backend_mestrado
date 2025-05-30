@@ -64,7 +64,7 @@ class SelecaoForm(forms.ModelForm):
 class FaseForm(forms.ModelForm):
     class Meta:
         model = Fase
-        fields = ['nome', 'descricao', 'data_inicio', 'data_fim', 'tipo_fase', 'peso']
+        fields = ['nome', 'descricao', 'data_inicio', 'data_fim', 'tipo_fase', 'peso', 'nota_corte', 'numero_vagas']
         widgets = {
             'data_inicio': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'data_fim': forms.DateTimeInput(attrs={'type': 'datetime-local'}),

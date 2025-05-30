@@ -139,7 +139,40 @@ class Selecao(models.Model):
         default=1,
         help_text="Número total de fases do processo seletivo"
     )
-    
+    fase_atual = models.PositiveIntegerField(
+        default=1,
+        help_text="Fase atual do processo seletivo"
+    )
+    def finalizar_fase_atual(self):
+        """Finaliza a fase atual e avança para a próxima se todos foram avaliados"""
+        fase_atual = self.fases_selecao.get(ordem=self.fase_atual)
+        inscricoes_na_fase = self.inscricoes.filter(fase_atual=self.fase_atual)
+        
+        # Verifica se todas as inscrições foram avaliadas
+        todas_avaliadas = all(
+            AvaliacaoFase.objects.filter(
+                fase=fase_atual,
+                inscricao=inscricao
+            ).exists()
+            for inscricao in inscricoes_na_fase
+        )
+        
+        if todas_avaliadas:
+            fase_atual.status = 'finalizada'
+            fase_atual.save()
+            
+            if self.fase_atual < self.quantidade_fases:
+                self.fase_atual += 1
+                self.save()
+                
+                # Atualiza a próxima fase para "atual"
+                proxima_fase = self.fases_selecao.get(ordem=self.fase_atual)
+                proxima_fase.status = 'atual'
+                proxima_fase.save()
+            else:
+                # Todas as fases foram concluídas
+                pass
+
     class Meta:
         verbose_name = 'Seleção'
         verbose_name_plural = 'Seleções'
@@ -190,7 +223,33 @@ class Fase(models.Model):
         default=1.0,
         help_text="Peso desta fase na avaliação final (0-1)"
     )
-    
+    nota_corte = models.DecimalField(
+        max_digits=4, 
+        decimal_places=2, 
+        default=7.0,
+        null=True,
+        blank=True,
+        help_text="Nota mínima para aprovação nesta fase (0-10)"
+    )
+
+    numero_vagas = models.PositiveIntegerField(
+        default=1,
+        null=True,
+        blank=True,
+        help_text="Número de inscrições que avançam para a próxima fase"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('não iniciada', 'Não iniciada'),
+            ('atual', 'Atual'),
+            ('finalizada', 'Finalizada'),
+        ],
+        default='não iniciada',
+        help_text="Status atual da fase"
+    )
+
     class Meta:
         verbose_name = 'Fase'
         verbose_name_plural = 'Fases'
@@ -271,6 +330,10 @@ class Inscricao(models.Model):
         null=True, 
         blank=True
     )
+    fase_atual = models.PositiveIntegerField(
+        default=1,
+        help_text="Fase atual do processo seletivo"
+    )
     
     class Meta:
         verbose_name = 'Inscrição'
@@ -280,6 +343,38 @@ class Inscricao(models.Model):
     
     def __str__(self):
         return f"Inscrição #{self.id}"
+    
+    def get_fase_atual(self):
+        """Retorna o objeto da fase atual"""
+        try:
+            return self.selecao.fases_selecao.get(ordem=self.fase_atual)
+        except Fase.DoesNotExist:
+            return None
+    
+    def avancar_fase(self):
+        """Avança para a próxima fase se aprovado na atual"""
+        fase_atual = self.get_fase_atual()
+        if not fase_atual:
+            return False
+            
+        avaliacao = self.avaliacoes_fases.filter(fase=fase_atual).first()
+        
+        if avaliacao and avaliacao.aprovado:
+            if self.fase_atual < self.selecao.quantidade_fases:
+                self.fase_atual += 1
+                self.save()
+                return True
+            else:
+                self.status = 'aprovada'
+                self.save()
+                return False
+        return False
+
+    
+    def reprovar(self):
+        """Marca a inscrição como reprovada"""
+        self.status = 'reprovada'
+        self.save()
     
     def calcular_nota_final(self):
         """Calcula a nota final baseada nas avaliações das fases"""
