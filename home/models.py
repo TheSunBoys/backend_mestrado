@@ -145,7 +145,11 @@ class Selecao(models.Model):
     )
     def finalizar_fase_atual(self):
         """Finaliza a fase atual e avança para a próxima se todos foram avaliados"""
-        fase_atual = self.fases_selecao.get(ordem=self.fase_atual)
+        try:
+            fase_atual = self.fases_selecao.get(ordem=self.fase_atual)
+        except Fase.DoesNotExist:
+            return False
+
         inscricoes_na_fase = self.inscricoes.filter(fase_atual=self.fase_atual)
         
         # Verifica se todas as inscrições foram avaliadas
@@ -165,13 +169,18 @@ class Selecao(models.Model):
                 self.fase_atual += 1
                 self.save()
                 
-                # Atualiza a próxima fase para "atual"
-                proxima_fase = self.fases_selecao.get(ordem=self.fase_atual)
-                proxima_fase.status = 'atual'
-                proxima_fase.save()
+                # Atualiza a próxima fase para "não iniciada"
+                try:
+                    proxima_fase = self.fases_selecao.get(ordem=self.fase_atual)
+                    proxima_fase.status = 'não iniciada'
+                    proxima_fase.save()
+                except Fase.DoesNotExist:
+                    pass
             else:
                 # Todas as fases foram concluídas
                 pass
+            return True
+        return False
 
     class Meta:
         verbose_name = 'Seleção'

@@ -36,6 +36,8 @@ urlpatterns = [
     path('avaliar-inscricoes-massa/<int:selecao_id>/', views.avaliar_inscricoes_massa, name='avaliar_inscricoes_massa'),
     path('avaliar-inscricao/<int:inscricao_id>/', views.avaliar_inscricao, name='avaliar_inscricao'),
     path('selecao/<int:selecao_id>/avaliar-fase/', views.avaliar_fase, name='avaliar_fase'),
+    path('selecao/<int:selecao_id>/iniciar-fase/<int:fase_id>/', views.iniciar_fase, name='iniciar_fase'),
+    path('selecao/<int:selecao_id>/finalizar-fase/<int:fase_id>/', views.finalizar_fase, name='finalizar_fase'),
     # Admin
     path('admin/usuarios/', views.administrar_usuarios, name='administrar_usuarios'),
 ]

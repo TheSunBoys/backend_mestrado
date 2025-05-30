@@ -12,7 +12,8 @@ from .models import (
     Edital, 
     Selecao, 
     Inscricao, 
-    AvaliacaoFase
+    AvaliacaoFase,
+    Fase
 )
 from .forms import (
     UsuarioForm, 
@@ -471,13 +472,84 @@ def avaliar_fase(request, selecao_id):
                     avaliacao.save()
 
         messages.success(request, 'Avaliações salvas com sucesso!')
-        return redirect('detalhes_selecao', selecao_id=selecao.id)
+        return redirect('detalhes_selecao', pk=selecao_id)
 
     return render(request, 'home/selecoes/avaliar_fase.html', {
         'selecao': selecao,
         'fase': fase,
         'inscricoes_com_avaliacoes': inscricoes_com_avaliacoes
     })
+
+@login_required
+@user_passes_test(is_professor)
+def iniciar_fase(request, selecao_id, fase_id):
+    selecao = get_object_or_404(Selecao, pk=selecao_id)
+    fase = get_object_or_404(Fase, pk=fase_id, selecao=selecao)
+    
+    # Verifica se o usuário tem permissão
+    if request.user != selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para iniciar esta fase.')
+        return redirect('detalhes_selecao', pk=selecao_id)
+    
+    # Verifica se a fase pode ser iniciada
+    if fase.ordem != selecao.fase_atual:
+        messages.error(request, 'Você só pode iniciar a fase atual em sequência.')
+        return redirect('detalhes_selecao', pk=selecao_id)
+    
+    if fase.status != 'não iniciada':
+        messages.error(request, 'Esta fase já foi iniciada ou finalizada.')
+        return redirect('detalhes_selecao', pk=selecao_id)
+    
+    # Verifica se a fase anterior foi finalizada (exceto para a primeira fase)
+    if fase.ordem > 1:
+        fase_anterior = selecao.fases_selecao.get(ordem=fase.ordem-1)
+        if fase_anterior.status != 'finalizada':
+            messages.error(request, 'Você precisa finalizar a fase anterior antes de iniciar esta.')
+            return redirect('detalhes_selecao', pk=selecao_id)
+    
+    # Inicia a fase
+    fase.status = 'atual'
+    fase.save()
+    
+    messages.success(request, f'Fase {fase.ordem} iniciada com sucesso!')
+    return redirect('detalhes_selecao', pk=selecao_id)
+
+@login_required
+@user_passes_test(is_professor)
+def finalizar_fase(request, selecao_id, fase_id):
+    selecao = get_object_or_404(Selecao, pk=selecao_id)
+    fase = get_object_or_404(Fase, pk=fase_id, selecao=selecao)
+    
+    # Verifica se o usuário tem permissão
+    if request.user != selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para finalizar esta fase.')
+        return redirect('detalhes_selecao', pk=selecao_id)
+    
+    # Verifica se a fase pode ser finalizada
+    if fase.status != 'atual':
+        messages.error(request, 'Esta fase não está ativa para ser finalizada.')
+        return redirect('detalhes_selecao', pk=selecao_id)
+    
+    # Finaliza a fase
+    fase.status = 'finalizada'
+    fase.save()
+    
+    # Avança para a próxima fase se houver
+    if selecao.fase_atual < selecao.quantidade_fases:
+        selecao.fase_atual += 1
+        selecao.save()
+        
+        # Atualiza a próxima fase para "não iniciada"
+        try:
+            proxima_fase = selecao.fases_selecao.get(ordem=selecao.fase_atual)
+            proxima_fase.status = 'não iniciada'
+            proxima_fase.save()
+        except Fase.DoesNotExist:
+            pass
+    
+    messages.success(request, f'Fase {fase.ordem} finalizada com sucesso!')
+    return redirect('detalhes_selecao', pk=selecao_id)
+
 @login_required
 @user_passes_test(is_professor)
 def avaliar_inscricoes_massa(request, selecao_id):
