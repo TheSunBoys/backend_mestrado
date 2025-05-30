@@ -228,10 +228,40 @@
                                 <label for="{{ fase_form.tipo_fase.id_for_label }}" class="form-label">
                                     Tipo de Fase<span class="required-asterisk">*</span>
                                 </label>
-                                {{ fase_form.tipo_fase|add_class:"form-select"|add_error_class:"is-invalid" }}
+                                {{ fase_form.tipo_fase|add_class:"form-select tipo-fase"|add_error_class:"is-invalid" }}
                                 {% if fase_form.tipo_fase.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in fase_form.tipo_fase.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Campo de Vagas (Classificatória) -->
+                            <div class="mb-3 campo-vagas" style="display: none;">
+                                <label for="{{ fase_form.numero_vagas.id_for_label }}" class="form-label">
+                                    Número de Vagas<span class="required-asterisk">*</span>
+                                </label>
+                                {{ fase_form.numero_vagas|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if fase_form.numero_vagas.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in fase_form.numero_vagas.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Campo de Nota de Corte (Eliminatória) -->
+                            <div class="mb-3 campo-nota-corte" style="display: none;">
+                                <label for="{{ fase_form.nota_corte.id_for_label }}" class="form-label">
+                                    Nota de Corte<span class="required-asterisk">*</span>
+                                </label>
+                                {{ fase_form.nota_corte|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if fase_form.nota_corte.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in fase_form.nota_corte.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
@@ -310,7 +340,37 @@
         document.addEventListener('DOMContentLoaded', function() {
             const fasesContainer = document.getElementById('fases-container');
             const quantidadeFasesInput = document.querySelector('[name="quantidade_fases"]');
-    
+        
+            // Função para atualizar campos baseado no tipo de fase
+            function atualizarCamposTipoFase(selectElement) {
+                const faseCard = selectElement.closest('.fase-card');
+                const campoVagas = faseCard.querySelector('.campo-vagas');
+                const campoNotaCorte = faseCard.querySelector('.campo-nota-corte');
+        
+                if (selectElement.value === 'classificatoria') {
+                    campoVagas.style.display = 'block';
+                    campoNotaCorte.style.display = 'none';
+                } else if (selectElement.value === 'eliminatoria') {
+                    campoVagas.style.display = 'none';
+                    campoNotaCorte.style.display = 'block';
+                } else {
+                    campoVagas.style.display = 'none';
+                    campoNotaCorte.style.display = 'none';
+                }
+            }
+        
+            // Função para configurar eventos em um card de fase
+            function configurarEventosFase(faseCard) {
+                const selectTipoFase = faseCard.querySelector('.tipo-fase');
+                if (selectTipoFase) {
+                    selectTipoFase.addEventListener('change', function() {
+                        atualizarCamposTipoFase(this);
+                    });
+                    // Atualiza inicialmente
+                    atualizarCamposTipoFase(selectTipoFase);
+                }
+            }
+        
             // Função para renderizar os cards de fase
             function renderFaseCards(quantidade) {
                 fasesContainer.innerHTML = ''; // Limpa o contêiner
@@ -337,10 +397,22 @@
                         <!-- Tipo de Fase -->
                         <div class="mb-3">
                             <label class="form-label">Tipo de Fase<span class="required-asterisk">*</span></label>
-                            <select name="fase-${i}-tipo_fase" class="form-select" required>
+                            <select name="fase-${i}-tipo_fase" class="form-select tipo-fase" required>
                                 <option value="classificatoria">Classificatória</option>
                                 <option value="eliminatoria">Eliminatória</option>
                             </select>
+                        </div>
+                        
+                        <!-- Campo de Vagas (Classificatória) -->
+                        <div class="mb-3 campo-vagas" style="display: none;">
+                            <label class="form-label">Número de Vagas<span class="required-asterisk">*</span></label>
+                            <input type="number" name="fase-${i}-numero_vagas" class="form-control">
+                        </div>
+                        
+                        <!-- Campo de Nota de Corte (Eliminatória) -->
+                        <div class="mb-3 campo-nota-corte" style="display: none;">
+                            <label class="form-label">Nota de Corte<span class="required-asterisk">*</span></label>
+                            <input type="number" name="fase-${i}-nota_corte" class="form-control" step="0.1">
                         </div>
                         
                         <!-- Data de Início -->
@@ -362,18 +434,27 @@
                         </div>
                     `;
                     fasesContainer.appendChild(faseCard);
+                    
+                    // Configura os eventos para o card recém-criado
+                    configurarEventosFase(faseCard);
                 }
             }
-    
+        
             // Evento para monitorar mudanças no número de fases
             quantidadeFasesInput.addEventListener('change', function() {
-                const quantidade = parseInt(this.value, 10) || 1; // Garante que o valor seja um número válido
+                const quantidade = parseInt(this.value, 10) || 1;
                 renderFaseCards(quantidade);
             });
-    
+        
+            // Configura eventos para as fases iniciais (caso existam)
+            document.querySelectorAll('.fase-card').forEach(configurarEventosFase);
+            
             // Renderiza os cards iniciais com base no valor inicial do campo
-            renderFaseCards(parseInt(quantidadeFasesInput.value, 10) || 1);
+            const quantidadeInicial = parseInt(quantidadeFasesInput.value, 10) || 1;
+            if (quantidadeInicial > 0) {
+                renderFaseCards(quantidadeInicial);
+            }
         });
-    </script>
+        </script>
 </body>
 </html>

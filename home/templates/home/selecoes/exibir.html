@@ -114,19 +114,83 @@
                 <p class="text-muted">Nenhuma inscrição nesta seleção.</p>
             {% endif %}
         </div>
+        
+        <!-- Adicione esta seção após a tabela de inscrições -->
+<!-- Adicione esta seção após a tabela de inscrições -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="h5 mb-0">Progresso nas Fases</h3>
+        {% if user.tipo_usuario == 'professor' and selecao.professor_responsavel == user or user.is_superuser %}
+            <div class="btn-group">
+                {% with selecao.fases_selecao.all as fases %}
+                    {% for fase in fases %}
+                        {% if fase.ordem == selecao.fase_atual and fase.status == 'não iniciada' %}
+                            <form method="post" action="{% url 'iniciar_fase' selecao.id fase.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">Iniciar Fase {{ fase.ordem }}</button>
+                            </form>
+                        {% elif fase.ordem == selecao.fase_atual and fase.status == 'atual' %}
+                            <form method="post" action="{% url 'finalizar_fase' selecao.id fase.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-warning">Finalizar Fase {{ fase.ordem }}</button>
+                            </form>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="progress mb-3" style="height: 30px;">
+            <div class="progress-bar bg-success" role="progressbar" 
+                 style="width: {% widthratio selecao.fase_atual selecao.quantidade_fases 100 %}%;" 
+                 aria-valuenow="{{ selecao.fase_atual }}" 
+                 aria-valuemin="1" 
+                 aria-valuemax="{{ selecao.quantidade_fases }}">
+                Fase {{ selecao.fase_atual }} de {{ selecao.quantidade_fases }}
+            </div>
+        </div>
+        
+        <div class="list-group">
+            {% for fase in selecao.fases_selecao.all %}
+            <div class="list-group-item 
+                {% if fase.status == 'finalizada' %}list-group-item-success
+                {% elif fase.status == 'atual' %}list-group-item-primary
+                {% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ fase.nome }} ({{ fase.ordem }}ª fase)</h5>
+                        <small class="text-muted">{{ fase.data_inicio|date:"d/m/Y" }} - {{ fase.data_fim|date:"d/m/Y" }}</small>
+                        <div>
+                            <span class="badge 
+                                {% if fase.status == 'finalizada' %}bg-success
+                                {% elif fase.status == 'atual' %}bg-primary
+                                {% else %}bg-secondary{% endif %}">
+                                {{ fase.get_status_display }}
+                            </span>
+                            <span class="badge bg-info text-dark">
+                                {{ fase.get_tipo_fase_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
         <div class="d-flex gap-2">
             {% if user.tipo_usuario == 'professor' %}
                 <a href="{% url 'editar_selecao' selecao.id %}" class="btn btn-secondary">Editar Seleção</a>
+                <!-- a href="{% url 'avaliar_inscricoes_massa' selecao.id %}" class="btn btn-primary">Avaliar Inscrições em Massa</a-->
+                <a href="{% url 'avaliar_fase' selecao.id %}" class="btn btn-primary">Avaliar Fase Atual</a>
             {% endif %}
-            <!-- filepath: c:\Users\Windows\Documents\Sistema de Estoque e Caixa\backend_mestrado\home\templates\home\selecoes\exibir.html -->
             {% if pode_inscrever %}
                 <a href="{% url 'inscrever_selecao' selecao.id %}" class="btn btn-primary">Inscrever-se</a>
             {% endif %}
             <a href="{% url 'exibir_edital' selecao.edital.id %}" class="btn btn-secondary">Voltar para Edital</a>
             <a href="{% url 'home' %}" class="btn btn-secondary">Voltar para o Início</a>
-
-
         </div>
     </div>
 
