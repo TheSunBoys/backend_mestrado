@@ -256,24 +256,81 @@ def get_fase_form(request):
 @login_required
 @user_passes_test(is_professor)
 def editar_selecao(request, pk):
-    """Edição de seleção existente"""
     selecao = get_object_or_404(Selecao, pk=pk)
-    
     if request.user != selecao.professor_responsavel and not request.user.is_superuser:
         messages.error(request, 'Você não tem permissão para editar esta seleção.')
         return redirect('detalhes_selecao', pk=selecao.id)
-    
+
     if request.method == 'POST':
         form = SelecaoForm(request.POST, instance=selecao)
-        if form.is_valid():
-            form.save()
+        fases = selecao.fases_selecao.all().order_by('ordem')
+        fase_forms = [FaseForm(request.POST, prefix=f"fase-{i+1}", instance=fase) for i, fase in enumerate(fases)]
+
+        # Processa as fases já existentes normalmente
+        if form.is_valid() and all(f.is_valid() for f in fase_forms):
+            selecao = form.save()
+            for i, fase_form in enumerate(fase_forms):
+                fase = fase_form.save(commit=False)
+                fase.selecao = selecao
+                fase.ordem = i + 1
+                fase.save()
+
+            # Processa as novas fases adicionadas dinamicamente
+            nova_fase_count = 1
+            while True:
+                nome = request.POST.get(f'nova_fase_nome_{nova_fase_count}')
+                print(f"Processando nova fase {nova_fase_count}: nome={nome}")
+                if not nome:
+                    print(f"Parando processamento de novas fases em nova_fase_count={nova_fase_count} (nome vazio ou não encontrado)")
+                    break  # Não há mais novas fases
+                descricao = request.POST.get(f'nova_fase_descricao_{nova_fase_count}', '')
+                tipo_fase = request.POST.get(f'nova_fase_tipo_{nova_fase_count}')
+                numero_vagas = request.POST.get(f'nova_fase_numero_vagas_{nova_fase_count}') or None
+                nota_corte = request.POST.get(f'nova_fase_nota_corte_{nova_fase_count}') or None
+                data_inicio = request.POST.get(f'nova_fase_data_inicio_{nova_fase_count}')
+                data_fim = request.POST.get(f'nova_fase_data_fim_{nova_fase_count}')
+                peso = request.POST.get(f'nova_fase_peso_{nova_fase_count}')
+
+                print(
+                    f"Nova fase {nova_fase_count} - nome: {nome}, descricao: {descricao}, tipo_fase: {tipo_fase}, "
+                    f"numero_vagas: {numero_vagas}, nota_corte: {nota_corte}, data_inicio: {data_inicio}, "
+                    f"data_fim: {data_fim}, peso: {peso}"
+                )
+
+                try:
+                    Fase.objects.create(
+                        selecao=selecao,
+                        nome=nome,
+                        descricao=descricao,
+                        tipo_fase=tipo_fase,
+                        numero_vagas=numero_vagas if tipo_fase == 'classificatoria' else None,
+                        nota_corte=nota_corte if tipo_fase == 'eliminatoria' else None,
+                        data_inicio=data_inicio,
+                        data_fim=data_fim,
+                        peso=peso,
+                        ordem=fases.count() + nova_fase_count
+                    )
+                    print(f"Nova fase {nova_fase_count} criada com sucesso.")
+                except Exception as e:
+                    print(f"Erro ao criar nova fase {nova_fase_count}: {e}")
+
+                nova_fase_count += 1
+
             messages.success(request, 'Seleção atualizada com sucesso!')
             return redirect('detalhes_selecao', pk=selecao.id)
+        else:
+            print("Formulário principal ou de fases inválido.")
+            print(f"Erros do form: {form.errors}")
+            for idx, f in enumerate(fase_forms):
+                print(f"Erros do fase_form {idx+1}: {f.errors}")
     else:
         form = SelecaoForm(instance=selecao)
-    
+        fases = selecao.fases_selecao.all().order_by('ordem')
+        fase_forms = [FaseForm(instance=fase, prefix=f"fase-{i+1}") for i, fase in enumerate(fases)]
+
     return render(request, 'home/selecoes/editar.html', {
         'form': form,
+        'fase_forms': fase_forms,
         'selecao': selecao,
         'edital': selecao.edital
     })

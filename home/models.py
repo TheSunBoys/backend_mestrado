@@ -194,8 +194,8 @@ class Selecao(models.Model):
         if self.data_inicio >= self.data_fim:
             raise ValidationError("A data de término deve ser posterior à data de início")
         
-        if self.data_inicio < timezone.now():
-            raise ValidationError("A data de início não pode ser no passado")
+        #if self.data_inicio < timezone.now():
+            #raise ValidationError("A data de início não pode ser no passado")
 
 class Fase(models.Model):
     TIPO_FASE_CHOICES = [
@@ -272,9 +272,9 @@ class Fase(models.Model):
         if self.data_inicio >= self.data_fim:
             raise ValidationError("A data de término deve ser posterior à data de início")
         
-        if self.selecao:
-            if self.data_inicio < self.selecao.data_inicio or self.data_fim > self.selecao.data_fim:
-                raise ValidationError("As datas da fase devem estar dentro do período da seleção")
+        #if self.selecao:
+            #if self.data_inicio < self.selecao.data_inicio or self.data_fim > self.selecao.data_fim:
+                #raise ValidationError("As datas da fase devem estar dentro do período da seleção")
 
 class CampoFase(models.Model):
     fase = models.ForeignKey(
