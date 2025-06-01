@@ -115,9 +115,8 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>
-                                {% if user.tipo_usuario == 'professor' %}
-                                    <a href="{% url 'avaliar_inscricao' inscricao.id %}" class="btn btn-sm btn-outline-primary">Avaliar</a>
+                                {% if inscricao.documento %}
+                                    <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>                                
                                 {% endif %}
                             </td>
                         </tr>
@@ -130,8 +129,6 @@
             {% endif %}
         </div>
         
-        <!-- Adicione esta seção após a tabela de inscrições -->
-<!-- Adicione esta seção após a tabela de inscrições -->
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="h5 mb-0">Progresso nas Fases</h3>
@@ -139,7 +136,7 @@
             <div class="btn-group">
                 {% with selecao.fases_selecao.all as fases %}
                     {% for fase in fases %}
-                        {% if fase.ordem == selecao.fase_atual and fase.status == 'não iniciada' %}
+                        {% if fase.ordem == selecao.fase_atual and fase.status == 'não iniciada' or fase.status == 'nÒo iniciada' %}
                             <form method="post" action="{% url 'iniciar_fase' selecao.id fase.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-success">Iniciar Fase {{ fase.ordem }}</button>
