@@ -1,4 +1,4 @@
-
+<!-- avaliar_fase.html -->
 {% block content %}
 <div class="container mt-5">
     <div class="card">
@@ -21,14 +21,33 @@
                         <thead>
                             <tr>
                                 <th>Aluno</th>
+                                <th>Histórico nas Fases</th>
                                 <th>Nota (0-10)</th>
-                                <th>Status</th>
+                                <th>Status Atual</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in inscricoes_com_avaliacoes %}
                             <tr>
                                 <td>{{ item.inscricao.aluno.get_full_name }}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        {% for fase_num, status in item.status_por_fase.items %}
+                                            <div class="text-center">
+                                                <div class="small">Fase {{ fase_num }}</div>
+                                                <span class="badge 
+                                                    {% if status.status == 'Aprovado' %}bg-success
+                                                    {% elif status.status == 'Reprovado' %}bg-danger
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ status.status }}
+                                                </span>
+                                                {% if status.nota %}
+                                                    <div class="small">{{ status.nota }}</div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
                                 <td>
                                     <input type="number" name="nota_{{ item.inscricao.id }}" 
                                            class="form-control" min="0" max="10" step="0.1" required

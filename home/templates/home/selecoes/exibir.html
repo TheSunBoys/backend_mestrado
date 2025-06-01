@@ -76,12 +76,13 @@
             <h3 class="h5">Inscrições</h3>
             {% if inscricoes %}
             <div class="table-responsive">
+                <!-- exibir.html (parte da tabela de inscrições) -->
                 <table class="table table-striped table-bordered align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th>Aluno</th>
-                            <th>Data</th>
-                            <th>Status</th>
+                            <th>Progresso nas Fases</th>
+                            <th>Status Geral</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -89,7 +90,21 @@
                         {% for inscricao in inscricoes %}
                         <tr>
                             <td>{{ inscricao.aluno.get_full_name }}</td>
-                            <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    {% for fase_num, status in inscricao.get_status_por_fase.items %}
+                                        <div class="text-center">
+                                            <div class="small">Fase {{ fase_num }}</div>
+                                            <span class="badge 
+                                                {% if status.status == 'Aprovado' %}bg-success
+                                                {% elif status.status == 'Reprovado' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ status.status }}
+                                            </span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
                             <td>
                                 {% if inscricao.status == 'aprovada' %}
                                     <span class="badge bg-success">Aprovada</span>
