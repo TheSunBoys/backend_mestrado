@@ -1,66 +1,130 @@
-
-{% block content %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h2>Avaliar Fase {{ fase.ordem }} - {{ fase.nome }}</h2>
-            <p class="mb-0">
-                {% if fase.tipo_fase == 'eliminatoria' %}
-                    Nota de corte: {{ fase.nota_corte }}
-                {% else %}
-                    Vagas para próxima fase: {{ fase.numero_vagas }}
-                {% endif %}
-            </p>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Avaliar Fase - Sistema de Seleção de Mestrado UERN</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Sistema de Seleção</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_editais' %}">Editais</a>
+                    </li>
+                    <li class="nav-item">
+                        {% if user.tipo_usuario == 'aluno' %}
+                            <a class="nav-link" href="{% url 'area_aluno' %}">Área do Aluno</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if user.tipo_usuario == 'professor' %}
+                            <a class="nav-link" href="{% url 'area_professor' %}">Área do Professor</a>
+                        {% endif %}
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link text-white">Sair</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th>Nota (0-10)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in inscricoes_com_avaliacoes %}
-                            <tr>
-                                <td>{{ item.inscricao.aluno.get_full_name }}</td>
-                                <td>
-                                    <input type="number" name="nota_{{ item.inscricao.id }}" 
-                                           class="form-control" min="0" max="10" step="0.1" required
-                                           value="{{ item.avaliacao.nota|default_if_none:'' }}">
-                                </td>
-                                <td>
-                                    {% if item.avaliacao %}
-                                        {% if item.avaliacao.aprovado %}
-                                            <span class="badge bg-success">Aprovado</span>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Avaliar Fase {{ fase.ordem }} - {{ fase.nome }}</h2>
+                <p class="mb-0">
+                    {% if fase.tipo_fase == 'eliminatoria' %}
+                        Nota de corte: {{ fase.nota_corte }}
+                    {% else %}
+                        Vagas para próxima fase: {{ fase.numero_vagas }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Histórico nas Fases</th>
+                                    <th>Nota (0-10)</th>
+                                    <th>Status Atual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in inscricoes_com_avaliacoes %}
+                                <tr>
+                                    <td>{{ item.inscricao.aluno.get_full_name }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            {% for fase_num, status in item.status_por_fase.items %}
+                                                <div class="text-center">
+                                                    <div class="small">Fase {{ fase_num }}</div>
+                                                    <span class="badge 
+                                                        {% if status.status == 'Aprovado' %}bg-success
+                                                        {% elif status.status == 'Reprovado' %}bg-danger
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ status.status }}
+                                                    </span>
+                                                    {% if status.nota %}
+                                                        <div class="small">{{ status.nota }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="nota_{{ item.inscricao.id }}" 
+                                               class="form-control" min="0" max="10" step="0.1" required
+                                               value="{{ item.avaliacao.nota|default_if_none:'' }}">
+                                    </td>
+                                    <td>
+                                        {% if item.avaliacao %}
+                                            {% if item.avaliacao.aprovado %}
+                                                <span class="badge bg-success">Aprovado</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Reprovado</span>
+                                            {% endif %}
                                         {% else %}
-                                            <span class="badge bg-danger">Reprovado</span>
+                                            <span class="badge bg-warning">Pendente</span>
                                         {% endif %}
-                                    {% else %}
-                                        <span class="badge bg-warning">Pendente</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="d-flex justify-content-between mt-4">
-                    <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Voltar
-                    </a>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-save"></i> Salvar Avaliações
-                    </button>
-                </div>
-            </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'detalhes_selecao' selecao.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Salvar Avaliações
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

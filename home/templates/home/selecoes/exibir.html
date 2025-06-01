@@ -76,12 +76,13 @@
             <h3 class="h5">Inscrições</h3>
             {% if inscricoes %}
             <div class="table-responsive">
+                <!-- exibir.html (parte da tabela de inscrições) -->
                 <table class="table table-striped table-bordered align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th>Aluno</th>
-                            <th>Data</th>
-                            <th>Status</th>
+                            <th>Progresso nas Fases</th>
+                            <th>Status Geral</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -89,7 +90,21 @@
                         {% for inscricao in inscricoes %}
                         <tr>
                             <td>{{ inscricao.aluno.get_full_name }}</td>
-                            <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    {% for fase_num, status in inscricao.get_status_por_fase.items %}
+                                        <div class="text-center">
+                                            <div class="small">Fase {{ fase_num }}</div>
+                                            <span class="badge 
+                                                {% if status.status == 'Aprovado' %}bg-success
+                                                {% elif status.status == 'Reprovado' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ status.status }}
+                                            </span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
                             <td>
                                 {% if inscricao.status == 'aprovada' %}
                                     <span class="badge bg-success">Aprovada</span>
@@ -100,9 +115,8 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>
-                                {% if user.tipo_usuario == 'professor' %}
-                                    <a href="{% url 'avaliar_inscricao' inscricao.id %}" class="btn btn-sm btn-outline-primary">Avaliar</a>
+                                {% if inscricao.documento %}
+                                    <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>                                
                                 {% endif %}
                             </td>
                         </tr>
@@ -115,8 +129,6 @@
             {% endif %}
         </div>
         
-        <!-- Adicione esta seção após a tabela de inscrições -->
-<!-- Adicione esta seção após a tabela de inscrições -->
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="h5 mb-0">Progresso nas Fases</h3>
@@ -124,7 +136,7 @@
             <div class="btn-group">
                 {% with selecao.fases_selecao.all as fases %}
                     {% for fase in fases %}
-                        {% if fase.ordem == selecao.fase_atual and fase.status == 'não iniciada' %}
+                        {% if fase.ordem == selecao.fase_atual and fase.status == 'não iniciada' or fase.status == 'nÒo iniciada' %}
                             <form method="post" action="{% url 'iniciar_fase' selecao.id fase.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-success">Iniciar Fase {{ fase.ordem }}</button>

@@ -378,7 +378,31 @@ class Inscricao(models.Model):
                 self.save()
                 return False
         return False
-
+    
+    def get_status_por_fase(self):
+        """Retorna um dicionário com o status em cada fase"""
+        status_por_fase = {}
+        for fase in self.selecao.fases_selecao.all().order_by('ordem'):
+            avaliacao = self.avaliacoes_fases.filter(fase=fase).first()
+            if avaliacao:
+                status_por_fase[fase.ordem] = {
+                    'status': 'Aprovado' if avaliacao.aprovado else 'Reprovado',
+                    'nota': avaliacao.nota,
+                    'fase_nome': fase.nome
+                }
+            elif fase.ordem < self.fase_atual:
+                status_por_fase[fase.ordem] = {
+                    'status': 'Reprovado',
+                    'nota': None,
+                    'fase_nome': fase.nome
+                }
+            else:
+                status_por_fase[fase.ordem] = {
+                    'status': 'Pendente',
+                    'nota': None,
+                    'fase_nome': fase.nome
+                }
+        return status_por_fase
     
     def reprovar(self):
         """Marca a inscrição como reprovada"""

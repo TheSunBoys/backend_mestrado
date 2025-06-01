@@ -53,7 +53,6 @@ def home(request):
     
     return render(request, 'home/home.html', {'editais_recentes': editais_recentes})
 
-# --- Views de Autenticação ---
 def registrar_usuario(request):
     """Registro de novos usuários"""
     if request.method == 'POST':
@@ -61,7 +60,6 @@ def registrar_usuario(request):
         if form.is_valid():
             user = form.save()
             
-            # Login automático e redirecionamento
             login(request, user)
             if user.tipo_usuario == 'aluno':
                 return redirect('completar_perfil_aluno')
@@ -73,7 +71,6 @@ def registrar_usuario(request):
     
     return render(request, 'home/registro.html', {'form': form})
 
-# --- Views de Perfil ---
 @login_required
 @user_passes_test(is_aluno)
 def completar_perfil_aluno(request):
@@ -112,7 +109,6 @@ def completar_perfil_professor(request):
     
     return render(request, 'home/completar_perfil_professor.html', {'form': form})
 
-# --- Áreas Restritas ---
 @login_required
 @user_passes_test(is_aluno)
 def area_aluno(request):
@@ -143,7 +139,6 @@ def area_professor(request):
         'selecoes': selecoes
     })
 
-# --- Views de Edital ---
 @login_required
 def listar_editais(request):
     """Lista todos os editais ativos"""
@@ -156,7 +151,6 @@ def exibir_edital(request, pk):
     edital = get_object_or_404(Edital, pk=pk)
     selecoes = edital.selecoes.all().select_related('professor_responsavel')
     
-    # Verifica se o usuário pode criar seleções neste edital
     pode_criar_selecao = (
         request.user.tipo_usuario == 'professor' and 
         (request.user == edital.criado_por or request.user.is_superuser)
@@ -214,63 +208,39 @@ def excluir_edital(request, pk):
     messages.success(request, 'Edital desativado com sucesso!')
     return redirect('listar_editais')
 
-# --- Views de Seleção ---
 @login_required
 @user_passes_test(is_professor)
 def criar_selecao(request, edital_id):
     """Cria uma seleção associada a um edital"""
-    print("Iniciando a criação de seleção...")
     edital = get_object_or_404(Edital, pk=edital_id)
-    print(f"Edital encontrado: {edital}")
 
     if request.method == 'POST':
-        print("Método POST recebido.")
         form = SelecaoForm(request.POST)
-        print(f"Dados do formulário de seleção: {form.data}")
         quantidade_fases = int(request.POST.get('quantidade_fases', 0))
-        print(f"Quantidade de fases recebida: {quantidade_fases}")
         
         fase_forms = [FaseForm(request.POST, prefix=f"fase-{x + 1}") for x in range(quantidade_fases)]
-        print(f"Formulários de fases criados: {len(fase_forms)}")
-
-        if form.is_valid():
-            print("Formulário de seleção válido.")
-        else:
-            print(f"Erros no formulário de seleção: {form.errors}")
-
-        if all(f.is_valid() for f in fase_forms):
-            print("Todos os formulários de fases são válidos.")
-        else:
-            for i, fase_form in enumerate(fase_forms):
-                if not fase_form.is_valid():
-                    print(f"Erros no formulário da fase {i + 1}: {fase_form.errors}")
 
         if form.is_valid() and all(f.is_valid() for f in fase_forms):
             selecao = form.save(commit=False)
             selecao.edital = edital
             selecao.professor_responsavel = request.user
             selecao.save()
-            print(f"Seleção criada: {selecao}")
 
             for i, fase_form in enumerate(fase_forms):
                 fase = fase_form.save(commit=False)
                 fase.selecao = selecao
                 fase.ordem = i + 1
                 fase.save()
-                print(f"Fase {i + 1} criada: {fase}")
             
             messages.success(request, 'Seleção criada com sucesso!')
-            print("Seleção e fases criadas com sucesso.")
             return redirect('exibir_edital', pk=edital.id)
         else:
             print("Erro na validação dos formulários.")
 
     else:
-        print("Método GET recebido.")
         form = SelecaoForm()
         fase_forms = []
 
-    print("Renderizando o template de criação de seleção.")
     return render(request, 'home/selecoes/criar.html', {
         'form': form,
         'fase_forms': fase_forms,
@@ -289,7 +259,6 @@ def editar_selecao(request, pk):
     """Edição de seleção existente"""
     selecao = get_object_or_404(Selecao, pk=pk)
     
-    # Verifica se o usuário tem permissão para editar
     if request.user != selecao.professor_responsavel and not request.user.is_superuser:
         messages.error(request, 'Você não tem permissão para editar esta seleção.')
         return redirect('detalhes_selecao', pk=selecao.id)
@@ -320,7 +289,6 @@ def detalhes_selecao(request, pk):
         not inscricoes.filter(aluno=request.user).exists()
     )
     
-    # Verifica se o usuário já está inscrito
     ja_inscrito = False
     if request.user.is_authenticated and request.user.tipo_usuario == 'aluno':
         ja_inscrito = inscricoes.filter(aluno=request.user).exists()
@@ -329,11 +297,10 @@ def detalhes_selecao(request, pk):
         'selecao': selecao,
         'inscricoes': inscricoes,
         'ja_inscrito': ja_inscrito,
-        'pode_inscrever': True, #pode_inscrever,
+        'pode_inscrever': True, #remover essa linha
         'now': timezone.now()
     })
 
-# --- Views de Inscrição ---
 @login_required
 @user_passes_test(is_aluno)
 def inscrever_selecao(request, pk):
@@ -341,10 +308,9 @@ def inscrever_selecao(request, pk):
     selecao = get_object_or_404(Selecao, pk=pk)
     ja_inscrito = Inscricao.objects.filter(aluno=request.user, selecao=selecao).exists()
     
-    if ja_inscrito: # or not (selecao.data_inicio <= timezone.now() <= selecao.data_fim):
+    if ja_inscrito:
         messages.error(request, "Inscrição não permitida")
         return redirect('detalhes_selecao', pk=pk)
-    # Verifica se já está inscrito
     if Inscricao.objects.filter(aluno=request.user, selecao=selecao).exists():
         messages.warning(request, 'Você já está inscrito nesta seleção!')
         return redirect('area_aluno')
@@ -427,30 +393,21 @@ def avaliar_inscricao(request, inscricao_id):
 @user_passes_test(lambda u: u.tipo_usuario == 'professor')
 def avaliar_fase(request, selecao_id):
     selecao = get_object_or_404(Selecao, id=selecao_id)
-    print(f"Seleção encontrada: {selecao}")
-    print(f"Fases da seleção: {selecao.fases_selecao.all()}")
-
     fase = selecao.fases_selecao.filter(status='atual').first()
-    print(f"Fase atual encontrada: {fase}")
-    if fase:
-        print(f"Detalhes da fase atual: ID={fase.id}, Ordem={fase.ordem}, Tipo={fase.tipo_fase}, Nota de Corte={fase.nota_corte}, Status={fase.status}")
-    else:
-        print("Nenhuma fase atual encontrada.")
-    
     inscricoes = selecao.inscricoes.all()
-    print(f"Inscrições encontradas: {inscricoes}")
 
-    # Prepara as avaliações para o template
     inscricoes_com_avaliacoes = []
     for inscricao in inscricoes:
         avaliacao = inscricao.avaliacoes_fases.filter(fase=fase).first()
+        status_por_fase = inscricao.get_status_por_fase()
+        
         inscricoes_com_avaliacoes.append({
             'inscricao': inscricao,
-            'avaliacao': avaliacao
+            'avaliacao': avaliacao,
+            'status_por_fase': status_por_fase
         })
 
     if request.method == 'POST':
-        # Lógica para salvar as avaliações
         for item in inscricoes_com_avaliacoes:
             inscricao = item['inscricao']
             nota = request.POST.get(f'nota_{inscricao.id}')
@@ -458,7 +415,6 @@ def avaliar_fase(request, selecao_id):
                 nota = float(nota)
                 avaliacao = item['avaliacao']
                 if not avaliacao:
-                    # Cria uma nova avaliação se não existir
                     avaliacao = AvaliacaoFase.objects.create(
                         fase=fase,
                         inscricao=inscricao,
@@ -466,7 +422,6 @@ def avaliar_fase(request, selecao_id):
                         aprovado=(nota >= fase.nota_corte if fase.tipo_fase == 'eliminatoria' else True)
                     )
                 else:
-                    # Atualiza a avaliação existente
                     avaliacao.nota = nota
                     avaliacao.aprovado = (nota >= fase.nota_corte if fase.tipo_fase == 'eliminatoria' else True)
                     avaliacao.save()
@@ -486,12 +441,10 @@ def iniciar_fase(request, selecao_id, fase_id):
     selecao = get_object_or_404(Selecao, pk=selecao_id)
     fase = get_object_or_404(Fase, pk=fase_id, selecao=selecao)
     
-    # Verifica se o usuário tem permissão
     if request.user != selecao.professor_responsavel and not request.user.is_superuser:
         messages.error(request, 'Você não tem permissão para iniciar esta fase.')
         return redirect('detalhes_selecao', pk=selecao_id)
     
-    # Verifica se a fase pode ser iniciada
     if fase.ordem != selecao.fase_atual:
         messages.error(request, 'Você só pode iniciar a fase atual em sequência.')
         return redirect('detalhes_selecao', pk=selecao_id)
@@ -500,14 +453,12 @@ def iniciar_fase(request, selecao_id, fase_id):
         messages.error(request, 'Esta fase já foi iniciada ou finalizada.')
         return redirect('detalhes_selecao', pk=selecao_id)
     
-    # Verifica se a fase anterior foi finalizada (exceto para a primeira fase)
     if fase.ordem > 1:
         fase_anterior = selecao.fases_selecao.get(ordem=fase.ordem-1)
         if fase_anterior.status != 'finalizada':
             messages.error(request, 'Você precisa finalizar a fase anterior antes de iniciar esta.')
             return redirect('detalhes_selecao', pk=selecao_id)
     
-    # Inicia a fase
     fase.status = 'atual'
     fase.save()
     
@@ -520,26 +471,32 @@ def finalizar_fase(request, selecao_id, fase_id):
     selecao = get_object_or_404(Selecao, pk=selecao_id)
     fase = get_object_or_404(Fase, pk=fase_id, selecao=selecao)
     
-    # Verifica se o usuário tem permissão
     if request.user != selecao.professor_responsavel and not request.user.is_superuser:
         messages.error(request, 'Você não tem permissão para finalizar esta fase.')
         return redirect('detalhes_selecao', pk=selecao_id)
     
-    # Verifica se a fase pode ser finalizada
     if fase.status != 'atual':
         messages.error(request, 'Esta fase não está ativa para ser finalizada.')
         return redirect('detalhes_selecao', pk=selecao_id)
     
-    # Finaliza a fase
+    inscricoes_na_fase = selecao.inscricoes.filter(fase_atual=fase.ordem)
+    for inscricao in inscricoes_na_fase:
+        if not inscricao.avaliacoes_fases.filter(fase=fase).exists():
+            messages.error(request, f'A inscrição de {inscricao.aluno.get_full_name()} não foi avaliada!')
+            return redirect('detalhes_selecao', pk=selecao_id)
+    
     fase.status = 'finalizada'
     fase.save()
     
-    # Avança para a próxima fase se houver
+    for inscricao in inscricoes_na_fase:
+        avaliacao = inscricao.avaliacoes_fases.filter(fase=fase).first()
+        if not avaliacao.aprovado:
+            inscricao.reprovar()
+
     if selecao.fase_atual < selecao.quantidade_fases:
         selecao.fase_atual += 1
         selecao.save()
         
-        # Atualiza a próxima fase para "não iniciada"
         try:
             proxima_fase = selecao.fases_selecao.get(ordem=selecao.fase_atual)
             proxima_fase.status = 'não iniciada'
@@ -558,12 +515,11 @@ def avaliar_inscricoes_massa(request, selecao_id):
     inscricoes = selecao.inscricoes.all()
 
     if request.method == 'POST':
-        fase_atual = selecao.fases_selecao.first()  # Considerando a primeira fase para simplificação
+        fase_atual = selecao.fases_selecao.first()
         for inscricao in inscricoes:
             nota = request.POST.get(f'nota_{inscricao.id}')
             aprovado = request.POST.get(f'aprovado_{inscricao.id}') == 'on'
             if nota:
-                # Atualiza a avaliação da fase
                 avaliacao, created = AvaliacaoFase.objects.update_or_create(
                     fase=fase_atual,
                     inscricao=inscricao,
@@ -574,12 +530,11 @@ def avaliar_inscricoes_massa(request, selecao_id):
                     }
                 )
                 
-                # Lógica de aprovação e reprovação
                 if fase_atual.tipo_fase == 'classificatoria':
-                    if inscricao.inscricoes.count() < fase_atual.numero_vagas:  # Verifica se a nota está dentro do número de vagas
+                    if inscricao.inscricoes.count() < fase_atual.numero_vagas:
                         inscricao.avancar_fase()
                 elif fase_atual.tipo_fase == 'eliminatoria':
-                    if float(nota) >= fase_atual.nota_corte:  # Verifica se a nota está acima da nota de corte
+                    if float(nota) >= fase_atual.nota_corte:
                         inscricao.avancar_fase()
                     else:
                         inscricao.reprovar()
@@ -592,7 +547,6 @@ def avaliar_inscricoes_massa(request, selecao_id):
         'inscricoes': inscricoes,
     })
 
-# --- Views de Documentos ---
 def extract_text_from_pdf(pdf_file):
     """Extrai texto de PDF para análise"""
     pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -635,7 +589,6 @@ def analisar_documentos(request):
     
     return JsonResponse({'error': 'Método não permitido'}, status=405)
 
-# --- Views de Administração ---
 @login_required
 @user_passes_test(is_admin)
 def administrar_usuarios(request):
@@ -654,7 +607,6 @@ def alterar_tipo_usuario(request, usuario_id):
         usuario.tipo_usuario = novo_tipo
         usuario.save()
         
-        # Remove perfis antigos se o tipo mudar
         if novo_tipo != 'aluno':
             Aluno.objects.filter(usuario=usuario).delete()
         if novo_tipo != 'professor':
