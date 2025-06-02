@@ -13,7 +13,10 @@ from .models import (
     Selecao, 
     Inscricao, 
     AvaliacaoFase,
-    Fase
+    Fase,
+    ValorCampoFase,
+    TipoCampo,
+    CampoFase
 )
 from .forms import (
     UsuarioForm, 
@@ -645,6 +648,163 @@ def analisar_documentos(request):
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+@login_required
+@user_passes_test(is_professor)
+def gerenciar_campos_fase(request, fase_id):
+    fase = get_object_or_404(Fase, pk=fase_id)
+    campos = fase.campos.all().order_by('ordem')
+    
+    if request.user != fase.selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para gerenciar esta fase.')
+        return redirect('detalhes_selecao', pk=fase.selecao.id)
+    
+    return render(request, 'home/fases/gerenciar_campos.html', {
+        'fase': fase,
+        'campos': campos
+    })
+
+@login_required
+@user_passes_test(is_professor)
+def adicionar_campo_fase(request, fase_id):
+    fase = get_object_or_404(Fase, pk=fase_id)
+    
+    if request.user != fase.selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para adicionar campos nesta fase.')
+        return redirect('gerenciar_campos_fase', fase_id=fase_id)
+    
+    if request.method == 'POST':
+        tipo_campo_id = request.POST.get('tipo_campo')
+        tipo_campo = get_object_or_404(TipoCampo, pk=tipo_campo_id)
+        
+        campo = CampoFase(
+            fase=fase,
+            tipo=tipo_campo,
+            nome=request.POST.get('nome'),
+            descricao=request.POST.get('descricao', ''),
+            obrigatorio=request.POST.get('obrigatorio') == 'on',
+            ordem=request.POST.get('ordem', 1),
+            peso=request.POST.get('peso', 1.0)
+        )
+        campo.save()
+        messages.success(request, 'Campo adicionado com sucesso!')
+        return redirect('gerenciar_campos_fase', fase_id=fase_id)
+    
+    tipos_campo = TipoCampo.objects.all()
+    return render(request, 'home/fases/adicionar_campo.html', {
+        'fase': fase,
+        'tipos_campo': tipos_campo
+    })
+
+@login_required
+@user_passes_test(is_professor)
+def editar_campo_fase(request, campo_id):
+    campo = get_object_or_404(CampoFase, pk=campo_id)
+    
+    if request.user != campo.fase.selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para editar este campo.')
+        return redirect('gerenciar_campos_fase', fase_id=campo.fase.id)
+    
+    if request.method == 'POST':
+        campo.nome = request.POST.get('nome')
+        campo.descricao = request.POST.get('descricao', '')
+        campo.obrigatorio = request.POST.get('obrigatorio') == 'on'
+        campo.ordem = request.POST.get('ordem', 1)
+        campo.peso = request.POST.get('peso', 1.0)
+        campo.save()
+        messages.success(request, 'Campo atualizado com sucesso!')
+        return redirect('gerenciar_campos_fase', fase_id=campo.fase.id)
+    
+    return render(request, 'home/fases/editar_campo.html', {
+        'campo': campo
+    })
+
+@login_required
+@user_passes_test(is_professor)
+def excluir_campo_fase(request, campo_id):
+    campo = get_object_or_404(CampoFase, pk=campo_id)
+    fase_id = campo.fase.id
+    
+    if request.user != campo.fase.selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para excluir este campo.')
+        return redirect('gerenciar_campos_fase', fase_id=fase_id)
+    
+    campo.delete()
+    messages.success(request, 'Campo excluído com sucesso!')
+    return redirect('gerenciar_campos_fase', fase_id=fase_id)
+
+@login_required
+@user_passes_test(is_aluno)
+def responder_fase(request, fase_id):
+    fase = get_object_or_404(Fase, pk=fase_id)
+    inscricao = get_object_or_404(Inscricao, selecao=fase.selecao, aluno=request.user)
+    
+    if fase.status != 'atual' or inscricao.fase_atual != fase.ordem:
+        messages.error(request, 'Você não pode responder esta fase no momento.')
+        return redirect('detalhes_selecao', pk=fase.selecao.id)
+    
+    campos = fase.campos.all().order_by('ordem')
+    
+    if request.method == 'POST':
+        for campo in campos:
+            valor = request.POST.get(f'campo_{campo.id}')
+            arquivo = request.FILES.get(f'arquivo_{campo.id}')
+            
+            ValorCampoFase.objects.update_or_create(
+                campo=campo,
+                inscricao=inscricao,
+                defaults={
+                    'valor_texto': valor if campo.tipo.tipo_dado in ['texto', 'escolha', 'multipla'] else None,
+                    'valor_numero': valor if campo.tipo.tipo_dado == 'numero' else None,
+                    'valor_data': valor if campo.tipo.tipo_dado == 'data' else None,
+                    'valor_arquivo': arquivo if campo.tipo.tipo_dado == 'arquivo' else None,
+                    'valor_booleano': valor == 'on' if campo.tipo.tipo_dado == 'booleano' else None,
+                }
+            )
+        
+        messages.success(request, 'Respostas enviadas com sucesso!')
+        return redirect('detalhes_selecao', pk=fase.selecao.id)
+    
+    valores = {v.campo.id: v for v in inscricao.valores_campos.filter(campo__in=campos)}
+    
+    return render(request, 'home/fases/responder.html', {
+        'fase': fase,
+        'campos': campos,
+        'valores': valores
+    })
+
+@login_required
+@user_passes_test(is_professor)
+def ver_respostas_fase(request, fase_id):
+    fase = get_object_or_404(Fase, pk=fase_id)
+    
+    if request.user != fase.selecao.professor_responsavel and not request.user.is_superuser:
+        messages.error(request, 'Você não tem permissão para ver estas respostas.')
+        return redirect('detalhes_selecao', pk=fase.selecao.id)
+    
+    inscricoes = fase.selecao.inscricoes.filter(fase_atual__gte=fase.ordem)
+    campos = fase.campos.all().order_by('ordem')
+    
+    # Estrutura para armazenar todas as respostas
+    respostas = []
+    for inscricao in inscricoes:
+        resposta = {
+            'inscricao': inscricao,
+            'valores': {}
+        }
+        for campo in campos:
+            try:
+                valor = inscricao.valores_campos.get(campo=campo)
+                resposta['valores'][campo.id] = valor.get_valor()
+            except ValorCampoFase.DoesNotExist:
+                resposta['valores'][campo.id] = None
+        respostas.append(resposta)
+    
+    return render(request, 'home/fases/respostas.html', {
+        'fase': fase,
+        'campos': campos,
+        'respostas': respostas
+    })
 
 @login_required
 @user_passes_test(is_admin)

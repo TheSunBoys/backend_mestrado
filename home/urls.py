@@ -40,4 +40,11 @@ urlpatterns = [
     path('selecao/<int:selecao_id>/finalizar-fase/<int:fase_id>/', views.finalizar_fase, name='finalizar_fase'),
     # Admin
     path('admin/usuarios/', views.administrar_usuarios, name='administrar_usuarios'),
+
+    path('fase/<int:fase_id>/campos/', views.gerenciar_campos_fase, name='gerenciar_campos_fase'),
+    path('fase/<int:fase_id>/adicionar-campo/', views.adicionar_campo_fase, name='adicionar_campo_fase'),
+    path('campo-fase/<int:campo_id>/editar/', views.editar_campo_fase, name='editar_campo_fase'),
+    path('campo-fase/<int:campo_id>/excluir/', views.excluir_campo_fase, name='excluir_campo_fase'),
+    path('fase/<int:fase_id>/responder/', views.responder_fase, name='responder_fase'),
+    path('fase/<int:fase_id>/respostas/', views.ver_respostas_fase, name='ver_respostas_fase'),
 ]

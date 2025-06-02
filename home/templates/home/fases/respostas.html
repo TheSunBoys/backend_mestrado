@@ -1,0 +1,43 @@
+{% block content %}
+{% load custom_filters %}
+<div class="container mt-4">
+    <h2>Respostas da Fase: {{ fase.nome }}</h2>
+    
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{% url 'detalhes_selecao' fase.selecao.id %}" class="btn btn-secondary">Voltar</a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    {% for campo in campos %}
+                    <th>{{ campo.nome }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for resposta in respostas %}
+                <tr>
+                    <td>{{ resposta.inscricao.aluno.get_full_name }}</td>
+                    {% for campo in campos %}
+                    <td>
+                        {% if resposta.valores|get_item:campo.id %}
+                            {% if campo.tipo.tipo_dado == 'arquivo' and resposta.valores|get_item:campo.id.url %}
+                                <a href="{{ resposta.valores|get_item:campo.id.url }}" target="_blank">Ver arquivo</a>
+                            {% else %}
+                                {{ resposta.valores|get_item:campo.id }}
+                            {% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
