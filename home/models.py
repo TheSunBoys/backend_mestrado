@@ -127,11 +127,11 @@ class Selecao(models.Model):
         limit_choices_to={'tipo_usuario': 'professor'},
     )
     data_inicio = models.DateTimeField(
-        default="2001-09-10 00:00:00",
+        default=timezone.now,
         help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
     )
     data_fim = models.DateTimeField(
-        default="2001-09-11 00:00:00",
+        default=timezone.now,
         help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
     )
     vagas = models.PositiveIntegerField(default=1)
@@ -139,6 +139,48 @@ class Selecao(models.Model):
         default=1,
         help_text="Número total de fases do processo seletivo"
     )
+    fase_atual = models.PositiveIntegerField(
+        default=1,
+        help_text="Fase atual do processo seletivo"
+    )
+    def finalizar_fase_atual(self):
+        """Finaliza a fase atual e avança para a próxima se todos foram avaliados"""
+        try:
+            fase_atual = self.fases_selecao.get(ordem=self.fase_atual)
+        except Fase.DoesNotExist:
+            return False
+
+        inscricoes_na_fase = self.inscricoes.filter(fase_atual=self.fase_atual)
+
+        # Verifica se todas as inscrições foram avaliadas
+        todas_avaliadas = all(
+            AvaliacaoFase.objects.filter(
+                fase=fase_atual,
+                inscricao=inscricao
+            ).exists()
+            for inscricao in inscricoes_na_fase
+        )
+
+        if todas_avaliadas:
+            fase_atual.status = 'finalizada'
+            fase_atual.save()
+
+            if self.fase_atual < self.quantidade_fases:
+                self.fase_atual += 1
+                self.save()
+
+                # Atualiza a próxima fase para "não iniciada"
+                try:
+                    proxima_fase = self.fases_selecao.get(ordem=self.fase_atual)
+                    proxima_fase.status = 'não iniciada'
+                    proxima_fase.save()
+                except Fase.DoesNotExist:
+                    pass
+            else:
+                # Todas as fases foram concluídas
+                pass
+            return True
+        return False
 
     class Meta:
         verbose_name = 'Seleção'
@@ -156,6 +198,11 @@ class Selecao(models.Model):
             raise ValidationError("A data de início não pode ser no passado")
 
 class Fase(models.Model):
+    TIPO_FASE_CHOICES = [
+        ('classificatoria', 'Classificatória'),
+        ('eliminatoria', 'Eliminatória'),
+    ]
+
     selecao = models.ForeignKey(
         Selecao,
         on_delete=models.CASCADE,
@@ -167,12 +214,17 @@ class Fase(models.Model):
     descricao = models.TextField(blank=True)
     ordem = models.PositiveIntegerField(default=1)
     data_inicio = models.DateTimeField(
-        default="2001-09-10 00:00:00",
+        default=timezone.now,
         help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
     )
     data_fim = models.DateTimeField(
-        default="2001-09-11 00:00:00",
+        default=timezone.now,
         help_text="Use o formato YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
+    )
+    tipo_fase = models.CharField(
+        max_length=15,
+        choices=TIPO_FASE_CHOICES,
+        default='classificatoria'
     )
     peso = models.DecimalField(
         max_digits=5,
@@ -180,9 +232,31 @@ class Fase(models.Model):
         default=1.0,
         help_text="Peso desta fase na avaliação final (0-1)"
     )
-    obrigatoria = models.BooleanField(
-        default=True,
-        help_text="Se a fase é obrigatória para aprovação"
+    nota_corte = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=7.0,
+        null=True,
+        blank=True,
+        help_text="Nota mínima para aprovação nesta fase (0-10)"
+    )
+
+    numero_vagas = models.PositiveIntegerField(
+        default=1,
+        null=True,
+        blank=True,
+        help_text="Número de inscrições que avançam para a próxima fase"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('não iniciada', 'Não iniciada'),
+            ('atual', 'Atual'),
+            ('finalizada', 'Finalizada'),
+        ],
+        default='não iniciada',
+        help_text="Status atual da fase"
     )
 
     class Meta:
@@ -198,9 +272,9 @@ class Fase(models.Model):
         if self.data_inicio >= self.data_fim:
             raise ValidationError("A data de término deve ser posterior à data de início")
 
-        # Verifica se as datas estão dentro do período da seleção
-        if self.data_inicio < self.selecao.data_inicio or self.data_fim > self.selecao.data_fim:
-            raise ValidationError("As datas da fase devem estar dentro do período da seleção")
+        if self.selecao:
+            if self.data_inicio < self.selecao.data_inicio or self.data_fim > self.selecao.data_fim:
+                raise ValidationError("As datas da fase devem estar dentro do período da seleção")
 
 class CampoFase(models.Model):
     fase = models.ForeignKey(
@@ -265,6 +339,10 @@ class Inscricao(models.Model):
         null=True,
         blank=True
     )
+    fase_atual = models.PositiveIntegerField(
+        default=1,
+        help_text="Fase atual do processo seletivo"
+    )
 
     class Meta:
         verbose_name = 'Inscrição'
@@ -274,6 +352,62 @@ class Inscricao(models.Model):
 
     def __str__(self):
         return f"Inscrição #{self.id}"
+
+    def get_fase_atual(self):
+        """Retorna o objeto da fase atual"""
+        try:
+            return self.selecao.fases_selecao.get(ordem=self.fase_atual)
+        except Fase.DoesNotExist:
+            return None
+
+    def avancar_fase(self):
+        """Avança para a próxima fase se aprovado na atual"""
+        fase_atual = self.get_fase_atual()
+        if not fase_atual:
+            return False
+
+        avaliacao = self.avaliacoes_fases.filter(fase=fase_atual).first()
+
+        if avaliacao and avaliacao.aprovado:
+            if self.fase_atual < self.selecao.quantidade_fases:
+                self.fase_atual += 1
+                self.save()
+                return True
+            else:
+                self.status = 'aprovada'
+                self.save()
+                return False
+        return False
+
+    def get_status_por_fase(self):
+        """Retorna um dicionário com o status em cada fase"""
+        status_por_fase = {}
+        for fase in self.selecao.fases_selecao.all().order_by('ordem'):
+            avaliacao = self.avaliacoes_fases.filter(fase=fase).first()
+            if avaliacao:
+                status_por_fase[fase.ordem] = {
+                    'status': 'Aprovado' if avaliacao.aprovado else 'Reprovado',
+                    'nota': avaliacao.nota,
+                    'fase_nome': fase.nome
+                }
+            elif fase.ordem < self.fase_atual:
+                status_por_fase[fase.ordem] = {
+                    'status': 'Reprovado',
+                    'nota': None,
+                    'fase_nome': fase.nome
+                }
+            else:
+                status_por_fase[fase.ordem] = {
+                    'status': 'Pendente',
+                    'nota': None,
+                    'fase_nome': fase.nome
+                }
+        return status_por_fase
+
+    def reprovar(self):
+        """Marca a inscrição como reprovada"""
+        self.status = 'reprovada'
+        self.save()
 
     def calcular_nota_final(self):
         """Calcula a nota final baseada nas avaliações das fases"""
@@ -384,21 +518,13 @@ class AvaliacaoFase(models.Model):
         return f"Avaliação de {self.inscricao.aluno} na fase {self.fase}"
 
     def save(self, *args, **kwargs):
-        # Atualiza automaticamente o status da inscrição se todas as fases foram avaliadas
         super().save(*args, **kwargs)
         self.inscricao.calcular_nota_final()
 
-        # Verifica se todas as fases obrigatórias foram aprovadas
-        fases_obrigatorias = self.inscricao.selecao.fases_selecao.filter(obrigatoria=True)
         avaliacoes_aprovadas = AvaliacaoFase.objects.filter(
             inscricao=self.inscricao,
-            fase__in=fases_obrigatorias,
             aprovado=True
         ).count()
 
-        if avaliacoes_aprovadas == fases_obrigatorias.count():
-            self.inscricao.status = 'aprovada'
-        elif self.inscricao.nota_final is not None:
-            self.inscricao.status = 'reprovada'
 
         self.inscricao.save()
