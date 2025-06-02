@@ -7,10 +7,30 @@ from faker import Faker
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mestrado.settings')
 django.setup()
 
-from home.models import Usuario, Aluno, Professor, Edital, Selecao, Fase, Inscricao, AvaliacaoFase
+from home.models import Usuario, Aluno, Professor, Edital, Selecao, Fase, Inscricao, AvaliacaoFase, TipoCampo
 from django.utils import timezone
 
 fake = Faker('pt_BR')
+
+def create_tipos_campo():
+    tipos = [
+        {'nome': 'Texto Linha', 'tipo_dado': 'texto', 'opcoes': ''},
+        {'nome': 'Texto Campo', 'tipo_dado': 'texto', 'opcoes': ''},
+        {'nome': 'Numérico', 'tipo_dado': 'numero', 'opcoes': ''},
+        {'nome': 'Checkbox', 'tipo_dado': 'booleano', 'opcoes': ''},
+        {'nome': 'Seleção Única', 'tipo_dado': 'escolha', 'opcoes': 'Excelente\nBom\nRegular\nRuim'},
+        {'nome': 'Seleção Múltipla', 'tipo_dado': 'multipla', 'opcoes': 'Python\nJava\nJavaScript\nC++\nOutros'},
+        {'nome': 'Data', 'tipo_dado': 'data', 'opcoes': ''},
+        {'nome': 'Arquivo', 'tipo_dado': 'arquivo', 'opcoes': ''},
+    ]
+    
+    for tipo in tipos:
+        TipoCampo.objects.create(
+            nome=tipo['nome'],
+            tipo_dado=tipo['tipo_dado'],
+            opcoes=tipo['opcoes']
+        )
+        print(f"Tipo de campo criado: {tipo['nome']} ({tipo['tipo_dado']})")
 
 def create_users():
     alunos = []
@@ -114,6 +134,7 @@ def create_enrollments(alunos, selecao):
 
 def run_seed():
     print("Iniciando seed...")
+    create_tipos_campo()
     alunos, professor = create_users()
     selecao = create_selection(professor)
     create_enrollments(alunos, selecao)

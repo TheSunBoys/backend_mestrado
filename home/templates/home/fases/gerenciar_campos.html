@@ -1,0 +1,46 @@
+{% block content %}
+<div class="container mt-4">
+    <h2>Gerenciar Campos da Fase: {{ fase.nome }}</h2>
+    
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{% url 'detalhes_selecao' fase.selecao.id %}" class="btn btn-secondary">Voltar</a>
+        <a href="{% url 'adicionar_campo_fase' fase.id %}" class="btn btn-primary">Adicionar Campo</a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            {% if campos %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ordem</th>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Obrigatório</th>
+                        <th>Peso</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campo in campos %}
+                    <tr>
+                        <td>{{ campo.ordem }}</td>
+                        <td>{{ campo.nome }}</td>
+                        <td>{{ campo.tipo.get_tipo_dado_display }}</td>
+                        <td>{% if campo.obrigatorio %}Sim{% else %}Não{% endif %}</td>
+                        <td>{{ campo.peso }}</td>
+                        <td>
+                            <a href="{% url 'editar_campo_fase' campo.id %}" class="btn btn-sm btn-primary">Editar</a>
+                            <a href="{% url 'excluir_campo_fase' campo.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">Nenhum campo definido para esta fase.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

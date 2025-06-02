@@ -185,6 +185,15 @@
                             </span>
                         </div>
                     </div>
+                    {% if user.tipo_usuario == 'professor' and selecao.professor_responsavel == user or user.is_superuser %}
+                        <a href="{% url 'ver_respostas_fase' fase.id %}" class="btn btn-sm btn-outline-secondary">Ver Respostas</a>
+                    {% endif %}
+                    {% if user.tipo_usuario == 'professor' and selecao.professor_responsavel == user or user.is_superuser %}
+                        <a href="{% url 'gerenciar_campos_fase' fase.id %}" class="btn btn-sm btn-outline-secondary">Gerenciar Campos</a>
+                    {% endif %}
+                    {% if user.tipo_usuario == 'aluno' and fase.status == "atual"%}
+                        <a href="{% url 'responder_fase' fase.id %}" class="btn btn-sm btn-outline-secondary">Responder Formulario</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

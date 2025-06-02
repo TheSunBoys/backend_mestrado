@@ -9,3 +9,10 @@ def basename(value):
     Retorna apenas o nome do arquivo sem o caminho completo.
     """
     return os.path.basename(value)
+
+@register.filter
+def get_item(dictionary, key):
+    """Retorna o valor de um dicionário para uma chave específica."""
+    if dictionary is None:
+        return None
+    return dictionary.get(key)
