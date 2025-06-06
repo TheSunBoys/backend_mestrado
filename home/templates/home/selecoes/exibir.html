@@ -100,9 +100,16 @@
                                 {% endif %}
                             </td>
                             <td>
+<<<<<<< Updated upstream
                                 <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>
                                 {% if user.tipo_usuario == 'professor' %}
                                     <a href="{% url 'avaliar_inscricao' inscricao.id %}" class="btn btn-sm btn-outline-primary">Avaliar</a>
+=======
+                                {% if user.tipo_usuario == 'professor' %}
+                                    {% if inscricao.documento %}
+                                        <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>                                
+                                    {% endif %}
+>>>>>>> Stashed changes
                                 {% endif %}
                             </td>
                         </tr>
@@ -119,8 +126,12 @@
             {% if user.tipo_usuario == 'professor' %}
                 <a href="{% url 'editar_selecao' selecao.id %}" class="btn btn-secondary">Editar Seleção</a>
             {% endif %}
+<<<<<<< Updated upstream
             <!-- filepath: c:\Users\Windows\Documents\Sistema de Estoque e Caixa\backend_mestrado\home\templates\home\selecoes\exibir.html -->
             {% if pode_inscrever %}
+=======
+            {% if pode_inscrever and user.tipo_usuario == 'aluno' %}
+>>>>>>> Stashed changes
                 <a href="{% url 'inscrever_selecao' selecao.id %}" class="btn btn-primary">Inscrever-se</a>
             {% endif %}
             <a href="{% url 'exibir_edital' selecao.edital.id %}" class="btn btn-secondary">Voltar para Edital</a>
