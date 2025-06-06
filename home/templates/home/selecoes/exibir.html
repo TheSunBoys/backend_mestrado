@@ -101,14 +101,20 @@
                             </td>
                             <td>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                                 <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>
                                 {% if user.tipo_usuario == 'professor' %}
                                     <a href="{% url 'avaliar_inscricao' inscricao.id %}" class="btn btn-sm btn-outline-primary">Avaliar</a>
 =======
+=======
+>>>>>>> Stashed changes
                                 {% if user.tipo_usuario == 'professor' %}
                                     {% if inscricao.documento %}
                                         <a href="{{ inscricao.documento.url }}" class="btn btn-sm btn-outline-info" target="_blank">Ver Documento</a>                                
                                     {% endif %}
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                                 {% endif %}
                             </td>
@@ -127,8 +133,12 @@
                 <a href="{% url 'editar_selecao' selecao.id %}" class="btn btn-secondary">Editar Seleção</a>
             {% endif %}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             <!-- filepath: c:\Users\Windows\Documents\Sistema de Estoque e Caixa\backend_mestrado\home\templates\home\selecoes\exibir.html -->
             {% if pode_inscrever %}
+=======
+            {% if pode_inscrever and user.tipo_usuario == 'aluno' %}
+>>>>>>> Stashed changes
 =======
             {% if pode_inscrever and user.tipo_usuario == 'aluno' %}
 >>>>>>> Stashed changes
