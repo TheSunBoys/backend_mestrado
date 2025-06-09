@@ -16,7 +16,7 @@ SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
 WHERE pg_stat_activity.datname = 'mestrado';
 
-# Deletar o bd anterior
+# Deletar o banco de dados anterior
 DROP DATABASE mestrado;
 
 # Criar o novo BD
