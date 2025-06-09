@@ -19,7 +19,7 @@ WHERE pg_stat_activity.datname = 'mestrado';
 # Deletar o bd anterior
 DROP DATABASE mestrado;
 
-# Criar o novo BD
+# Criar o novo Banco de Dados
 CREATE DATABASE mestrado
 WITH ENCODING 'UTF8'
 LC_COLLATE 'en_US.UTF-8'
