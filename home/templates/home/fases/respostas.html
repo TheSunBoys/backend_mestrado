@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Respostas da Fase - Sistema de Seleção de Mestrado UERN</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+    .container-custom {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .card-header {
+      background-color: #00509d !important;
+      color: white;
+      border-bottom: none;
+      padding: 1rem 1.5rem;
+    }
+    .btn-primary {
+      background-color: #00509d;
+      border-color: #00509d;
+    }
+    .btn-primary:hover {
+      background-color: #003b73;
+      border-color: #003b73;
+    }
+    .table {
+      margin-bottom: 0;
+    }
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .table td {
+      vertical-align: middle;
+      border-color: #e9ecef;
+    }
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #dee2e6;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+    .phase-info {
+      background: linear-gradient(135deg, #00509d, #003b73);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+    .phase-info h2 {
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    .phase-info p {
+      margin-bottom: 0;
+      opacity: 0.9;
+    }
+    .file-link {
+      color: #00509d;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      border: 1px solid #cfe2ff;
+      background-color: #f8f9fa;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    .file-link:hover {
+      background-color: #cfe2ff;
+      color: #00509d;
+      text-decoration: none;
+    }
+    .empty-cell {
+      color: #6c757d;
+      font-style: italic;
+      text-align: center;
+    }
+    .export-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .table-container {
+      max-height: 70vh;
+      overflow: auto;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+    }
+    .student-name {
+      font-weight: 600;
+      color: #00509d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4 container-custom">
+    <!-- Phase Info Header -->
+    <div class="phase-info">
+      <h2 class="d-flex align-items-center">
+        <i class="bi bi-table me-3"></i>
+        Respostas da Fase: Análise de Documentos
+      </h2>
+      <p>Visualize e analise todas as respostas dos candidatos para esta fase da seleção</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+      <a href="{% url 'detalhes_selecao' fase.selecao.id %}" class="btn btn-outline-secondary d-inline-flex align-items-center">
+        <i class="bi bi-arrow-left me-2"></i> Voltar para Seleção
+      </a>
+      <div class="export-buttons">
+        <button class="btn btn-outline-success btn-sm d-inline-flex align-items-center">
+          <i class="bi bi-file-earmark-excel me-2"></i> Exportar Excel
+        </button>
+        <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center">
+          <i class="bi bi-file-earmark-pdf me-2"></i> Exportar PDF
+        </button>
+        <button class="btn btn-outline-primary btn-sm d-inline-flex align-items-center">
+          <i class="bi bi-printer me-2"></i> Imprimir
+        </button>
+      </div>
+    </div>
+
+    <!-- Responses Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h5 mb-0 d-flex align-items-center">
+          <i class="bi bi-table me-2"></i> Respostas dos Candidatos
+        </h3>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-container">
+          <!-- Original Table Structure - Unchanged -->
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  {% for campo in campos %}
+                  <th>{{ campo.nome }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for resposta in respostas %}
+                <tr>
+                  <td class="student-name">{{ resposta.inscricao.aluno.get_full_name }}</td>
+                  {% for campo in campos %}
+                  <td>
+                    {% for valor in resposta.valores %}
+                      {% if valor.campo_id == campo.id %}
+                        {% if campo.tipo.tipo_dado == 'arquivo' and valor.arquivo %}
+                          <a href="{{ valor.arquivo.url }}" target="_blank" class="file-link">
+                            <i class="bi bi-file-earmark"></i> Ver arquivo
+                          </a>
+                        {% elif campo.tipo.tipo_dado == 'texto' and valor.texto %}
+                          {{ valor.texto }}
+                        {% elif campo.tipo.tipo_dado == 'numero' and valor.numero %}
+                          {{ valor.numero }}
+                        {% elif campo.tipo.tipo_dado == 'url' and valor.url %}
+                          <a href="{{ valor.url }}" target="_blank" class="file-link">
+                            <i class="bi bi-link-45deg"></i> Ver link
+                          </a>
+                        {% else %}
+                          <span class="empty-cell">-</span>
+                        {% endif %}
+                      {% endif %}
+                    {% empty %}
+                      <span class="empty-cell">-</span>
+                    {% endfor %}
+                  </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="mb-1">Universidade Estadual do Rio Grande do Norte</p>
+      <p class="mb-0">Programa de Pós-Graduação</p>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Print functionality -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Print functionality
+      document.querySelector('.btn-outline-primary').addEventListener('click', function() {
+        window.print();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 # Criar Banco de Dados
-```bash
+```sql
 # VARIAVEIS, troque os valores se necessário
 # postgres é o meu usuário
 # mestrado é o nome do meu banco de dados
@@ -16,11 +16,11 @@ SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
 WHERE pg_stat_activity.datname = 'mestrado';
 
-# Deletar o bd anterior
+# Deletar o banco de dados anterior
 DROP DATABASE mestrado;
 
 # Criar o novo BD
-CREATE DATABASE mestrado
+CREATE DATABASE "mestrado";
 WITH ENCODING 'UTF8'
 LC_COLLATE 'en_US.UTF-8'
 LC_CTYPE 'en_US.UTF-8'

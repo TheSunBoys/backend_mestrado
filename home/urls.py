@@ -32,9 +32,19 @@ urlpatterns = [
     path('selecoes/<int:pk>/inscrever/', views.inscrever_selecao, name='inscrever_selecao'),
     path('selecoes/<int:pk>/editar/', views.editar_selecao, name='editar_selecao'),
 
-
-    
+    path('get-fase-form/', views.get_fase_form, name='get_fase_form'),
+    path('avaliar-inscricoes-massa/<int:selecao_id>/', views.avaliar_inscricoes_massa, name='avaliar_inscricoes_massa'),
     path('avaliar-inscricao/<int:inscricao_id>/', views.avaliar_inscricao, name='avaliar_inscricao'),
+    path('selecao/<int:selecao_id>/avaliar-fase/', views.avaliar_fase, name='avaliar_fase'),
+    path('selecao/<int:selecao_id>/iniciar-fase/<int:fase_id>/', views.iniciar_fase, name='iniciar_fase'),
+    path('selecao/<int:selecao_id>/finalizar-fase/<int:fase_id>/', views.finalizar_fase, name='finalizar_fase'),
     # Admin
     path('admin/usuarios/', views.administrar_usuarios, name='administrar_usuarios'),
+
+    path('fase/<int:fase_id>/campos/', views.gerenciar_campos_fase, name='gerenciar_campos_fase'),
+    path('fase/<int:fase_id>/adicionar-campo/', views.adicionar_campo_fase, name='adicionar_campo_fase'),
+    path('campo-fase/<int:campo_id>/editar/', views.editar_campo_fase, name='editar_campo_fase'),
+    path('campo-fase/<int:campo_id>/excluir/', views.excluir_campo_fase, name='excluir_campo_fase'),
+    path('fase/<int:fase_id>/responder/', views.responder_fase, name='responder_fase'),
+    path('fase/<int:fase_id>/respostas/', views.ver_respostas_fase, name='ver_respostas_fase'),
 ]

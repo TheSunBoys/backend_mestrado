@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Campos da Fase - Sistema de Seleção de Mestrado UERN</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+    .container-custom {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .card-header {
+      background-color: #00509d !important;
+      color: white;
+      border-bottom: none;
+      padding: 1rem 1.5rem;
+    }
+    .btn-primary {
+      background-color: #00509d;
+      border-color: #00509d;
+    }
+    .btn-primary:hover {
+      background-color: #003b73;
+      border-color: #003b73;
+    }
+    .table {
+      margin-bottom: 0;
+    }
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+    .table td {
+      vertical-align: middle;
+    }
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #dee2e6;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+    .btn-action {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    .btn-group-action {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .btn-edit {
+      color: #198754;
+      border-color: #d1e7dd;
+    }
+    .btn-edit:hover {
+      background-color: #d1e7dd;
+      color: #198754;
+    }
+    .btn-delete {
+      color: #dc3545;
+      border-color: #f5c2c7;
+    }
+    .btn-delete:hover {
+      background-color: #f5c2c7;
+      color: #dc3545;
+    }
+    .badge.bg-success {
+      background-color: #198754 !important;
+    }
+    .badge.bg-secondary {
+      background-color: #6c757d !important;
+    }
+    .phase-info {
+      background: linear-gradient(135deg, #00509d, #003b73);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+    .phase-info h2 {
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    .phase-info p {
+      margin-bottom: 0;
+      opacity: 0.9;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #6c757d;
+    }
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .order-badge {
+      background-color: #e9ecef;
+      color: #495057;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+    }
+    .type-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+    }
+    .weight-display {
+      font-weight: 600;
+      color: #00509d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4 container-custom">
+    <!-- Phase Info Header -->
+    <div class="phase-info">
+      <h2 class="d-flex align-items-center">
+        <i class="bi bi-gear me-3"></i>
+        Gerenciar Campos da Fase: Análise de Documentos
+      </h2>
+      <p>Configure os campos de avaliação e seus respectivos pesos para esta fase da seleção</p>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+      <a href="{% url 'detalhes_selecao' fase.selecao.id %}" class="btn btn-outline-secondary d-inline-flex align-items-center">
+        <i class="bi bi-arrow-left me-2"></i> Voltar para Seleção
+      </a>
+      <a href="{% url 'adicionar_campo_fase' fase.id %}" class="btn btn-primary d-inline-flex align-items-center">
+        <i class="bi bi-plus-circle me-2"></i> Adicionar Campo
+      </a>
+    </div>
+    
+    <!-- Fields Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h5 mb-0 d-flex align-items-center">
+          <i class="bi bi-list-ul me-2"></i> Campos Configurados
+        </h3>
+      </div>
+      <div class="card-body p-0">
+        <!-- Example with fields -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th class="ps-4">Ordem</th>
+                <th>Nome do Campo</th>
+                <th>Tipo</th>
+                <th>Obrigatório</th>
+                <th>Peso</th>
+                <th class="text-end pe-4">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ps-4">
+                  <span class="order-badge">1</span>
+                </td>
+                <td class="fw-medium">Histórico Acadêmico</td>
+                <td>
+                  <span class="badge bg-info type-badge">Arquivo PDF</span>
+                </td>
+                <td>
+                  <span class="badge bg-success">Sim</span>
+                </td>
+                <td>
+                  <span class="weight-display">4.0</span>
+                </td>
+                <td class="pe-4">
+                  <div class="btn-group-action justify-content-end">
+                    <a href="editar-campo-fase.html" class="btn btn-outline-success btn-action btn-edit" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <button class="btn btn-outline-danger btn-action btn-delete" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="ps-4">
+                  <span class="order-badge">2</span>
+                </td>
+                <td class="fw-medium">Projeto de Pesquisa</td>
+                <td>
+                  <span class="badge bg-info type-badge">Arquivo PDF</span>
+                </td>
+                <td>
+                  <span class="badge bg-success">Sim</span>
+                </td>
+                <td>
+                  <span class="weight-display">4.0</span>
+                </td>
+                <td class="pe-4">
+                  <div class="btn-group-action justify-content-end">
+                    <a href="editar-campo-fase.html" class="btn btn-outline-success btn-action btn-edit" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <button class="btn btn-outline-danger btn-action btn-delete" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="ps-4">
+                  <span class="order-badge">3</span>
+                </td>
+                <td class="fw-medium">Carta de Motivação</td>
+                <td>
+                  <span class="badge bg-warning type-badge text-dark">Texto</span>
+                </td>
+                <td>
+                  <span class="badge bg-secondary">Não</span>
+                </td>
+                <td>
+                  <span class="weight-display">2.0</span>
+                </td>
+                <td class="pe-4">
+                  <div class="btn-group-action justify-content-end">
+                    <a href="#" class="btn btn-outline-success btn-action btn-edit" title="Editar">
+  <i class="bi bi-pencil"></i>
+</a>
+<a href="#" class="btn btn-sm btn-danger" title="Excluir">
+  <i class="bi bi-trash"></i> Excluir
+</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State (uncomment to show when no fields) -->
+        <!--
+        <div class="empty-state">
+          <i class="bi bi-inbox"></i>
+          <h4>Nenhum campo definido</h4>
+          <p class="mb-3">Esta fase ainda não possui campos configurados.</p>
+          <a href="adicionar-campo-fase.html" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Adicionar Primeiro Campo
+          </a>
+        </div>
+        -->
+      </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title d-flex align-items-center">
+              <i class="bi bi-bar-chart me-2 text-primary"></i>
+              Resumo da Fase
+            </h5>
+            <div class="row text-center">
+              <div class="col-4">
+                <div class="h4 text-primary mb-0">3</div>
+                <small class="text-muted">Campos</small>
+              </div>
+              <div class="col-4">
+                <div class="h4 text-success mb-0">10.0</div>
+                <small class="text-muted">Peso Total</small>
+              </div>
+              <div class="col-4">
+                <div class="h4 text-warning mb-0">2</div>
+                <small class="text-muted">Obrigatórios</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title d-flex align-items-center">
+              <i class="bi bi-info-circle me-2 text-info"></i>
+              Informações
+            </h5>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                <small>Os campos são apresentados na ordem definida</small>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                <small>Pesos são usados para cálculo da nota final</small>
+              </li>
+              <li>
+                <i class="bi bi-check-circle text-success me-2"></i>
+                <small>Campos obrigatórios devem ser preenchidos</small>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="mb-1">Universidade Estadual do Rio Grande do Norte</p>
+      <p class="mb-0">Programa de Pós-Graduação</p>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle text-warning me-3" style="font-size: 2rem;"></i>
+            <div>
+              <p class="mb-2"><strong>Tem certeza que deseja excluir este campo?</strong></p>
+              <p class="mb-0 text-muted">Esta ação não pode ser desfeita e pode afetar inscrições já realizadas.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger">
+            <i class="bi bi-trash me-2"></i>Excluir Campo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
