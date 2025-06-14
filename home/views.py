@@ -556,6 +556,11 @@ def finalizar_fase(request, selecao_id, fase_id):
     if selecao.fase_atual < selecao.quantidade_fases:
         selecao.fase_atual += 1
         selecao.save()
+
+        inscricoes_ativas = selecao.inscricoes.filter(status='ativa')
+        for inscricao in inscricoes_ativas:
+            inscricao.fase_atual = selecao.fase_atual
+            inscricao.save()
         
         try:
             proxima_fase = selecao.fases_selecao.get(ordem=selecao.fase_atual)
@@ -676,6 +681,14 @@ def adicionar_campo_fase(request, fase_id):
     if request.method == 'POST':
         tipo_campo_id = request.POST.get('tipo_campo')
         tipo_campo = get_object_or_404(TipoCampo, pk=tipo_campo_id)
+        
+        # Process options for choice fields
+        opcoes = ""
+        if tipo_campo.tipo_dado in ['escolha', 'multipla']:
+            opcoes_list = request.POST.getlist('opcoes[]')
+            opcoes = "\n".join([opcao for opcao in opcoes_list if opcao.strip()])
+            tipo_campo.opcoes = opcoes
+            tipo_campo.save()
         
         campo = CampoFase(
             fase=fase,

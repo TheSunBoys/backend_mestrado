@@ -20,3 +20,10 @@ def get_item(dictionary, key):
 @register.filter
 def dict_get(d, key):
     return d.get(key)
+
+@register.filter
+def split(value, delimiter=','):
+    """Divide uma string em uma lista usando o delimitador especificado"""
+    if not value:
+        return []
+    return [item.strip() for item in value.split(delimiter)]
