@@ -175,96 +175,51 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td class="ps-4">
-                  <span class="order-badge">1</span>
-                </td>
-                <td class="fw-medium">Histórico Acadêmico</td>
-                <td>
-                  <span class="badge bg-info type-badge">Arquivo PDF</span>
-                </td>
-                <td>
-                  <span class="badge bg-success">Sim</span>
-                </td>
-                <td>
-                  <span class="weight-display">4.0</span>
-                </td>
-                <td class="pe-4">
-                  <div class="btn-group-action justify-content-end">
-                    <a href="editar-campo-fase.html" class="btn btn-outline-success btn-action btn-edit" title="Editar">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                    <button class="btn btn-outline-danger btn-action btn-delete" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="ps-4">
-                  <span class="order-badge">2</span>
-                </td>
-                <td class="fw-medium">Projeto de Pesquisa</td>
-                <td>
-                  <span class="badge bg-info type-badge">Arquivo PDF</span>
-                </td>
-                <td>
-                  <span class="badge bg-success">Sim</span>
-                </td>
-                <td>
-                  <span class="weight-display">4.0</span>
-                </td>
-                <td class="pe-4">
-                  <div class="btn-group-action justify-content-end">
-                    <a href="editar-campo-fase.html" class="btn btn-outline-success btn-action btn-edit" title="Editar">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                    <button class="btn btn-outline-danger btn-action btn-delete" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="ps-4">
-                  <span class="order-badge">3</span>
-                </td>
-                <td class="fw-medium">Carta de Motivação</td>
-                <td>
-                  <span class="badge bg-warning type-badge text-dark">Texto</span>
-                </td>
-                <td>
-                  <span class="badge bg-secondary">Não</span>
-                </td>
-                <td>
-                  <span class="weight-display">2.0</span>
-                </td>
-                <td class="pe-4">
-                  <div class="btn-group-action justify-content-end">
-                    <a href="#" class="btn btn-outline-success btn-action btn-edit" title="Editar">
-  <i class="bi bi-pencil"></i>
-</a>
-<a href="#" class="btn btn-sm btn-danger" title="Excluir">
-  <i class="bi bi-trash"></i> Excluir
-</a>
-                  </div>
-                </td>
-              </tr>
+              {% if campos %}
+                {% for campo in campos %}
+                  <tr>
+                    <td class="ps-4">
+                      <span class="order-badge">{{ campo.ordem }}</span>
+                    </td>
+                    <td class="fw-medium">{{ campo.nome }}</td>
+                    <td>
+                      <span class="badge bg-info type-badge">
+                        {{ campo.tipo.nome }} 
+                        {% if campo.tipo.tipo_dado == 'arquivo' %}(Arquivo){% elif campo.tipo.tipo_dado == 'texto' %}(Texto){% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      {% if campo.obrigatorio %}
+                        <span class="badge bg-success">Sim</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Não</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <span class="weight-display">{{ campo.peso }}</span>
+                    </td>
+                    <td class="pe-4">
+                      <div class="btn-group-action justify-content-end">
+                        <a href="{% url 'editar_campo_fase' campo.id %}" class="btn btn-outline-success btn-action btn-edit" title="Editar">
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="btn btn-outline-danger btn-action btn-delete" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal" data-campo-id="{{ campo.id }}">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <i class="bi bi-info-circle me-2"></i> Nenhum campo cadastrado para esta fase.
+                  </td>
+                </tr>
+              {% endif %}
             </tbody>
           </table>
         </div>
-
-        <!-- Empty State (uncomment to show when no fields) -->
-        <!--
-        <div class="empty-state">
-          <i class="bi bi-inbox"></i>
-          <h4>Nenhum campo definido</h4>
-          <p class="mb-3">Esta fase ainda não possui campos configurados.</p>
-          <a href="adicionar-campo-fase.html" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i> Adicionar Primeiro Campo
-          </a>
-        </div>
-        -->
       </div>
     </div>
 
@@ -329,32 +284,50 @@
 
   <!-- Delete Confirmation Modal -->
   <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle text-warning me-3" style="font-size: 2rem;"></i>
-            <div>
-              <p class="mb-2"><strong>Tem certeza que deseja excluir este campo?</strong></p>
-              <p class="mb-0 text-muted">Esta ação não pode ser desfeita e pode afetar inscrições já realizadas.</p>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-exclamation-triangle text-warning me-3" style="font-size: 2rem;"></i>
+              <div>
+                <p class="mb-2"><strong>Tem certeza que deseja excluir este campo?</strong></p>
+                <p class="mb-0 text-muted">Esta ação não pode ser desfeita e pode afetar inscrições já realizadas.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-danger">
-            <i class="bi bi-trash me-2"></i>Excluir Campo
-          </button>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form id="deleteForm" method="post" action="">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>Excluir Campo
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Configura o formulário de exclusão quando o modal é aberto
+      document.addEventListener('DOMContentLoaded', function() {
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+          var button = event.relatedTarget; // Botão que acionou o modal
+          var campoId = button.getAttribute('data-campo-id'); // Extrai o ID do campo
+          
+          // Atualiza o action do formulário com a URL correta
+          var deleteForm = document.getElementById('deleteForm');
+          deleteForm.action = "{% url 'excluir_campo_fase' 0 %}".replace('0', campoId);
+        });
+      });
+    </script>
+  </div>
 </body>
 </html>

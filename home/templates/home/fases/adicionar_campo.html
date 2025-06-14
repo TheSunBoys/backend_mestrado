@@ -138,6 +138,7 @@
         </h3>
       </div>
       <form method="post">
+        {% csrf_token %}
         <div class="card-body p-4">
           <!-- Field Type -->
           <div class="mb-4">
@@ -145,13 +146,10 @@
               <i class="bi bi-tag"></i>Tipo de Campo<span class="required">*</span>
             </label>
             <select name="tipo_campo" id="tipo_campo" class="form-select" required>
-              <option value="">Selecione o tipo de campo</option>
-              <option value="1">Histórico Acadêmico (Arquivo PDF)</option>
-              <option value="2">Projeto de Pesquisa (Arquivo PDF)</option>
-              <option value="3">Carta de Motivação (Texto)</option>
-              <option value="4">Currículo Lattes (URL)</option>
-              <option value="5">Certificados (Arquivo PDF)</option>
-              <option value="6">Nota de Graduação (Número)</option>
+                <option value="">Selecione o tipo de campo</option>
+                {% for tipo in tipos_campo %}
+                    <option value="{{ tipo.id }}">{{ tipo.nome }} ({{ tipo.get_tipo_dado_display }})</option>
+                {% endfor %}
             </select>
             <div class="help-text">
               <i class="bi bi-info-circle me-1"></i>

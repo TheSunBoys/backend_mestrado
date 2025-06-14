@@ -714,9 +714,10 @@ def editar_campo_fase(request, campo_id):
         campo.save()
         messages.success(request, 'Campo atualizado com sucesso!')
         return redirect('gerenciar_campos_fase', fase_id=campo.fase.id)
-    
+    tipos_campo = TipoCampo.objects.all()
     return render(request, 'home/fases/editar_campo.html', {
-        'campo': campo
+        'campo': campo,
+        'tipos_campo': tipos_campo
     })
 
 @login_required
