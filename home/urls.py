@@ -16,6 +16,8 @@ urlpatterns = [
     
     path('blog/', views.blog, name='blog'),
     # Perfis
+    path('cadastro/aluno/', views.cadastro_aluno, name='cadastro_aluno'),
+    #path('cadastro/professor/', views.cadastro_professor, name='cadastro_professor'),
     path('completar-perfil/aluno/', views.completar_perfil_aluno, name='completar_perfil_aluno'),
     path('completar-perfil/professor/', views.completar_perfil_professor, name='completar_perfil_professor'),
     
@@ -39,7 +41,10 @@ urlpatterns = [
     path('selecao/<int:selecao_id>/iniciar-fase/<int:fase_id>/', views.iniciar_fase, name='iniciar_fase'),
     path('selecao/<int:selecao_id>/finalizar-fase/<int:fase_id>/', views.finalizar_fase, name='finalizar_fase'),
     # Admin
-    path('admin/usuarios/', views.administrar_usuarios, name='administrar_usuarios'),
+    path('usuarios/', views.administrar_usuarios, name='administrar_usuarios'),
+    path('usuarios/novo/', views.cadastrar_professor_admin, name='cadastrar_professor_admin'),
+    path('usuarios/editar/<int:user_id>/', views.editar_usuario, name='editar_usuario'),
+    path('usuarios/excluir/<int:user_id>/', views.excluir_usuario, name='excluir_usuario'),
 
     path('fase/<int:fase_id>/campos/', views.gerenciar_campos_fase, name='gerenciar_campos_fase'),
     path('fase/<int:fase_id>/adicionar-campo/', views.adicionar_campo_fase, name='adicionar_campo_fase'),

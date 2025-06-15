@@ -1,0 +1,214 @@
+{% load static %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    .container-custom {
+        max-width: 950px;
+        margin: 40px auto;
+        padding: 0 16px;
+    }
+    .header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+    .header-bar h1 {
+        color: #00509d;
+        font-size: 2.2rem;
+        margin-bottom: 0.2rem;
+    }
+    .header-bar p {
+        color: #6c757d;
+        margin: 0;
+    }
+    .btn {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 5px;
+        border: 1px solid #00509d;
+        background: #00509d;
+        color: #fff;
+        text-decoration: none;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-left: 8px;
+    }
+    .btn-outline {
+        background: #fff;
+        color: #00509d;
+    }
+    .btn-outline:hover {
+        background: #e9ecef;
+    }
+    .btn-success {
+        background: #198754;
+        border-color: #198754;
+        color: #fff;
+    }
+    .btn-success:hover {
+        background: #146c43;
+    }
+    .btn-danger {
+        background: #d9534f;
+        border-color: #d9534f;
+        color: #fff;
+    }
+    .btn-danger:hover {
+        background: #b52a27;
+    }
+    .btn-group {
+        display: flex;
+        gap: 6px;
+    }
+    .card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    .card-header {
+        background: #00509d;
+        color: #fff;
+        padding: 18px 24px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+    .card-header i {
+        margin-right: 8px;
+    }
+    .card-body {
+        padding: 24px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+    thead {
+        background: #e9ecef;
+    }
+    th, td {
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+    }
+    th {
+        font-weight: 600;
+        color: #374151;
+    }
+    tr:last-child td {
+        border-bottom: none;
+    }
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.95em;
+        font-weight: 500;
+        color: #fff;
+    }
+    .bg-danger { background: #d9534f; }
+    .bg-success { background: #198754; }
+    .bg-primary { background: #0d6efd; }
+    .footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #dee2e6;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .icon {
+        font-style: normal;
+        margin-right: 4px;
+        font-weight: bold;
+    }
+</style>
+<div class="container-custom">
+    <!-- Cabeçalho -->
+    <div class="header-bar">
+        <div>
+            <h1>Área Administrativa</h1>
+            <p>Gerenciamento de Usuários</p>
+        </div>
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-outline">
+                <span class="icon">&#8592;</span> Voltar
+            </a>
+            <a href="{% url 'cadastrar_professor_admin' %}" class="btn btn-success">
+                <span class="icon">+</span> Novo Usuário
+            </a>
+        </div>
+    </div>
+
+    <!-- Lista de Usuários -->
+    <div class="card">
+        <div class="card-header">
+            <span class="icon">&#128101;</span> Todos os Usuários
+        </div>
+        <div class="card-body">
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Username</th>
+                            <th>Tipo</th>
+                            <th>Email</th>
+                            <th style="text-align:right;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.get_full_name }}</td>
+                            <td>{{ usuario.username }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if usuario.tipo_usuario == 'admin' %}bg-danger
+                                    {% elif usuario.tipo_usuario == 'professor' %}bg-success
+                                    {% else %}bg-primary{% endif %}">
+                                    {{ usuario.tipo_usuario|default:'aluno' }}
+                                </span>
+                            </td>
+                            <td>{{ usuario.email }}</td>
+                            <td style="text-align:right;">
+                                <div class="btn-group">
+                                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-outline" title="Editar">
+                                        <span class="icon">&#9998;</span>
+                                    </a>
+                                    <form action="{% url 'excluir_usuario' usuario.id %}" method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                            <span class="icon">&#128465;</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center" style="color:#888;">Nenhum usuário cadastrado</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p class="mb-1">Universidade Estadual do Rio Grande do Norte</p>
+        <p class="mb-0">Programa de Pós-Graduação</p>
+    </div>
+</div>
+{% endblock %}

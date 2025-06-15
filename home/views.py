@@ -30,6 +30,7 @@ from .forms import (
 import json
 from google import genai
 import PyPDF2
+from django.contrib.auth.hashers import make_password
 
 with open('key.json', 'r') as f:
     google_api_key = json.load(f)["api_key"]
@@ -74,6 +75,101 @@ def registrar_usuario(request):
     
     return render(request, 'home/registro.html', {'form': form})
 
+def cadastro_aluno(request):
+    if request.user.is_authenticated:
+        return redirect('area_aluno' if request.user.tipo_usuario == 'aluno' else 'home')
+    
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)
+        aluno_form = AlunoForm(request.POST, request.FILES)
+        if form.is_valid() and aluno_form.is_valid():
+            user = form.save(commit=False)
+            user.tipo_usuario = 'aluno'  # Força o tipo de usuário como aluno
+            user.save()
+            
+            aluno = aluno_form.save(commit=False)
+            aluno.usuario = user
+            aluno.save()
+            
+            login(request, user)
+            return redirect('area_aluno')
+    else:
+        form = UsuarioForm()
+        aluno_form = AlunoForm()
+
+    return render(request, 'home/cadastro_aluno.html', {
+        'form': form,
+        'aluno_form': aluno_form
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def administrar_usuarios(request):
+    usuarios = Usuario.objects.all().order_by('-date_joined')
+    return render(request, 'home/admin/administrar_usuarios.html', {'usuarios': usuarios})
+
+@login_required
+@user_passes_test(is_admin)
+def cadastrar_professor_admin(request):
+    if request.method == 'POST':
+        try:
+            user = Usuario(
+                first_name=request.POST['first_name'],
+                last_name=request.POST['last_name'],
+                username=request.POST['username'],
+                email=request.POST['email'],
+                password=make_password(request.POST['password']),
+                tipo_usuario=request.POST['tipo_usuario'],
+                cpf=request.POST['cpf'],
+            )
+            user.save()
+            print(f"Usuário {user.username} criado com sucesso.")
+            messages.success(request, 'Usuário cadastrado com sucesso!')
+            return redirect('administrar_usuarios')
+        except Exception as e:
+            messages.error(request, f'Erro ao cadastrar usuário: {str(e)}')
+            print(f"Erro ao cadastrar usuário: {str(e)}")
+            return redirect('cadastrar_professor_admin')
+    
+    return render(request, 'home/admin/cadastrar_usuario.html')
+
+@login_required
+@user_passes_test(is_admin)
+def editar_usuario(request, user_id):
+    usuario = get_object_or_404(Usuario, pk=user_id)
+    
+    if request.method == 'POST':
+        try:
+            usuario.first_name = request.POST['first_name']
+            usuario.last_name = request.POST['last_name']
+            usuario.username = request.POST['username']
+            usuario.email = request.POST['email']
+            usuario.tipo_usuario = request.POST['tipo_usuario']
+            usuario.cpf=request.POST['cpf'],
+            if request.POST['password']:
+                usuario.password = make_password(request.POST['password'])
+            
+            usuario.save()
+            messages.success(request, 'Usuário atualizado com sucesso!')
+            return redirect('administrar_usuarios')
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar usuário: {str(e)}')
+    
+    return render(request, 'home/admin/editar_usuario.html', {'usuario': usuario})
+
+@login_required
+@user_passes_test(is_admin)
+def excluir_usuario(request, user_id):
+    usuario = get_object_or_404(Usuario, pk=user_id)
+    
+    if request.method == 'POST':
+        try:
+            usuario.delete()
+            messages.success(request, 'Usuário excluído com sucesso!')
+        except Exception as e:
+            messages.error(request, f'Erro ao excluir usuário: {str(e)}')
+    
+    return redirect('administrar_usuarios')
 @login_required
 @user_passes_test(is_aluno)
 def completar_perfil_aluno(request):
@@ -819,13 +915,6 @@ def ver_respostas_fase(request, fase_id):
         'campos': campos,
         'respostas': respostas
     })
-
-@login_required
-@user_passes_test(is_admin)
-def administrar_usuarios(request):
-    """Gestão de usuários para administradores"""
-    usuarios = Usuario.objects.all().order_by('-date_joined')
-    return render(request, 'home/admin/usuarios.html', {'usuarios': usuarios})
 
 @login_required
 @user_passes_test(is_admin)
