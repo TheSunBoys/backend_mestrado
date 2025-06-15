@@ -117,6 +117,16 @@
       color: #00509d;
       font-size: 1.1rem;
     }
+    .remove-option {
+      transition: all 0.2s;
+    }
+    .remove-option:hover {
+      background-color: #f8d7da !important;
+      color: #dc3545 !important;
+    }
+    .input-group {
+      transition: all 0.3s;
+    }
   </style>
 </head>
 <body>
@@ -138,6 +148,7 @@
         </h3>
       </div>
       <form method="post">
+        {% csrf_token %}
         <div class="card-body p-4">
           <!-- Field Type -->
           <div class="mb-4">
@@ -145,13 +156,10 @@
               <i class="bi bi-tag"></i>Tipo de Campo<span class="required">*</span>
             </label>
             <select name="tipo_campo" id="tipo_campo" class="form-select" required>
-              <option value="">Selecione o tipo de campo</option>
-              <option value="1">Histórico Acadêmico (Arquivo PDF)</option>
-              <option value="2">Projeto de Pesquisa (Arquivo PDF)</option>
-              <option value="3">Carta de Motivação (Texto)</option>
-              <option value="4">Currículo Lattes (URL)</option>
-              <option value="5">Certificados (Arquivo PDF)</option>
-              <option value="6">Nota de Graduação (Número)</option>
+                <option value="">Selecione o tipo de campo</option>
+                {% for tipo in tipos_campo %}
+                    <option value="{{ tipo.id }}">{{ tipo.nome }} ({{ tipo.get_tipo_dado_display }})</option>
+                {% endfor %}
             </select>
             <div class="help-text">
               <i class="bi bi-info-circle me-1"></i>
@@ -182,7 +190,28 @@
               Instruções detalhadas que ajudarão os candidatos a preencher corretamente
             </div>
           </div>
-
+          <!-- Options Section (hidden by default) -->
+          <div id="options-section" class="mb-4" style="display: none;">
+            <label class="form-label">
+              <i class="bi bi-list-check"></i>Opções de Escolha<span class="required">*</span>
+            </label>
+            <div id="options-container">
+              <!-- Options will be added here dynamically -->
+              <div class="input-group mb-2">
+                <input type="text" name="opcoes[]" class="form-control" placeholder="Digite uma opção">
+                <button type="button" class="btn btn-outline-danger remove-option"> 
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <button type="button" id="add-option" class="btn btn-sm btn-outline-primary mt-2">
+              <i class="bi bi-plus-circle"></i> Adicionar Opção
+            </button>
+            <div class="help-text">
+              <i class="bi bi-info-circle me-1"></i>
+              Adicione uma opção por linha para os campos de escolha única ou múltipla
+            </div>
+          </div>
           <!-- Order and Weight -->
           <div class="row mb-4">
             <div class="col-md-6">
@@ -342,6 +371,49 @@
       pesoInput.addEventListener('input', updatePreview);
       descricaoTextarea.addEventListener('input', updatePreview);
       obrigatorioCheckbox.addEventListener('change', updatePreview);
+    });
+
+    // Dynamic options for choice fields
+    document.addEventListener('DOMContentLoaded', function() {
+      const tipoSelect = document.getElementById('tipo_campo');
+      const optionsSection = document.getElementById('options-section');
+      const optionsContainer = document.getElementById('options-container');
+      const addOptionBtn = document.getElementById('add-option');
+      
+      // Show/hide options section based on field type
+      tipoSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const tipoDado = selectedOption.text.match(/\((.*?)\)/)[1]; 
+        
+        if (tipoDado === 'Escolha Única' || tipoDado === 'Escolha Múltipla') {
+          optionsSection.style.display = 'block';
+        } else {
+          optionsSection.style.display = 'none';
+        }
+      });
+      
+      // Add new option
+      addOptionBtn.addEventListener('click', function() {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'input-group mb-2';
+        optionDiv.innerHTML = `
+          <input type="text" name="opcoes[]" class="form-control" placeholder="Digite uma opção">
+          <button type="button" class="btn btn-outline-danger remove-option">
+            <i class="bi bi-trash"></i>
+          </button>
+        `;
+        optionsContainer.appendChild(optionDiv);
+        
+        // Add event listener to remove button
+        optionDiv.querySelector('.remove-option').addEventListener('click', function() {
+          optionDiv.remove();
+        });
+      });
+      
+      // Add event listener to initial remove button
+      document.querySelector('.remove-option')?.addEventListener('click', function() {
+        this.closest('.input-group').remove();
+      });
     });
   </script>
 </body>

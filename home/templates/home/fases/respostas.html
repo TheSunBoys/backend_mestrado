@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  {% load custom_filters %}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Respostas da Fase - Sistema de Seleção de Mestrado UERN</title>
@@ -172,34 +173,38 @@
               </thead>
               <tbody>
                 {% for resposta in respostas %}
-                <tr>
-                  <td class="student-name">{{ resposta.inscricao.aluno.get_full_name }}</td>
-                  {% for campo in campos %}
-                  <td>
-                    {% for valor in resposta.valores %}
-                      {% if valor.campo_id == campo.id %}
-                        {% if campo.tipo.tipo_dado == 'arquivo' and valor.arquivo %}
-                          <a href="{{ valor.arquivo.url }}" target="_blank" class="file-link">
-                            <i class="bi bi-file-earmark"></i> Ver arquivo
-                          </a>
-                        {% elif campo.tipo.tipo_dado == 'texto' and valor.texto %}
-                          {{ valor.texto }}
-                        {% elif campo.tipo.tipo_dado == 'numero' and valor.numero %}
-                          {{ valor.numero }}
-                        {% elif campo.tipo.tipo_dado == 'url' and valor.url %}
-                          <a href="{{ valor.url }}" target="_blank" class="file-link">
-                            <i class="bi bi-link-45deg"></i> Ver link
-                          </a>
-                        {% else %}
-                          <span class="empty-cell">-</span>
-                        {% endif %}
-                      {% endif %}
-                    {% empty %}
-                      <span class="empty-cell">-</span>
+                  <tr>
+                    <td class="student-name">{{ resposta.inscricao.aluno.get_full_name }}</td>
+                    {% for campo in campos %}
+                      <td>
+                        {% with valor=resposta.valores|dict_get:campo.id %}
+                          {% if valor %}
+                            {% if campo.tipo.tipo_dado == 'arquivo' %}
+                              <a href="{{ valor.url }}" target="_blank" class="file-link">
+                                <i class="bi bi-file-earmark"></i> Ver arquivo
+                              </a>
+                            {% elif campo.tipo.tipo_dado == 'texto' or campo.tipo.tipo_dado == 'escolha' or campo.tipo.tipo_dado == 'multipla' %}
+                              {{ valor }}
+                            {% elif campo.tipo.tipo_dado == 'numero' %}
+                              {{ valor }}
+                            {% elif campo.tipo.tipo_dado == 'url' %}
+                              <a href="{{ valor }}" target="_blank" class="file-link">
+                                <i class="bi bi-link-45deg"></i> Ver link
+                              </a>
+                            {% elif campo.tipo.tipo_dado == 'booleano' %}
+                              {% if valor %}Sim{% else %}Não{% endif %}
+                            {% elif campo.tipo.tipo_dado == 'data' %}
+                              {{ valor }}
+                            {% else %}
+                              {{ valor }}
+                            {% endif %}
+                          {% else %}
+                            <span class="empty-cell">-</span>
+                          {% endif %}
+                        {% endwith %}
+                      </td>
                     {% endfor %}
-                  </td>
-                  {% endfor %}
-                </tr>
+                  </tr>
                 {% endfor %}
               </tbody>
             </table>

@@ -7,7 +7,7 @@ from django.utils import timezone
 class UsuarioForm(UserCreationForm):
     class Meta:
         model = Usuario
-        fields = ['username', 'email', 'first_name', 'last_name', 'cpf', 'telefone', 'tipo_usuario']
+        fields = ['username', 'email', 'first_name', 'last_name', 'cpf', 'telefone']
 
 class AlunoForm(forms.ModelForm):
     class Meta:

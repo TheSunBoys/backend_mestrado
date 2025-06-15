@@ -138,6 +138,23 @@ def run_seed():
     alunos, professor = create_users()
     selecao = create_selection(professor)
     create_enrollments(alunos, selecao)
+    if not Usuario.objects.filter(username='admin').exists():
+        Usuario.objects.create(
+            username='admin',
+            first_name='Admin',
+            last_name='Master',
+            email='admin@example.com',
+            is_superuser=True,
+            is_staff=True,
+            is_active=True,
+            tipo_usuario='admin',
+            cpf='00000000000',
+            telefone='(00) 00000-0000',
+            password=make_password('123456')
+        )
+        print('Usuário admin criado.')
+    else:
+        print('Usuário admin já existe.')
     print("Seed concluído com sucesso!")
 
 if __name__ == '__main__':

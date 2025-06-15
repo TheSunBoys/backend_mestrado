@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editar Seleção - Sistema de Seleção de Mestrado UERN</title>
+  <title>Editar Campo da Fase - Sistema de Seleção de Mestrado UERN</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
@@ -15,7 +15,7 @@
       padding: 2rem 0;
     }
     .container-custom {
-      max-width: 800px;
+      max-width: 600px;
       margin: 0 auto;
     }
     .card {
@@ -71,81 +71,73 @@
   <div class="container py-4 container-custom">
     <!-- Header -->
     <div class="mb-4">
-      <h1 class="fs-2 fw-bold mb-2">Editar Seleção</h1>
-      <p class="text-muted">Atualize as informações da seleção de mestrado.</p>
+      <h1 class="fs-2 fw-bold mb-2">Editar Campo da Fase</h1>
+      <p class="text-muted">Atualize as informações do campo de avaliação desta fase.</p>
     </div>
 
     <!-- Form Card -->
     <div class="card">
       <div class="card-header">
-        <h2 class="h5 mb-0">Formulário de Edição</h2>
+        <h2 class="h5 mb-0">Formulário de Edição do Campo</h2>
       </div>
-      <form>
+      <form method="post">
+        {% csrf_token %}
         <div class="card-body p-4">
-          <!-- Edital Selection -->
+          <!-- Nome do Campo -->
           <div class="mb-4">
-            <label for="edital" class="form-label">
-              <i class="bi bi-file-text"></i>Edital<span class="required">*</span>
+            <label for="nome" class="form-label">
+              <i class="bi bi-tag"></i>Nome do Campo<span class="required">*</span>
             </label>
-            <select class="form-select" id="edital" required>
-              <option value="">Selecione um edital</option>
-              <option value="1" selected>Edital de Seleção para Mestrado em Ciência da Computação 2025</option>
-              <option value="2">Edital de Bolsas CAPES para Mestrado</option>
-              <option value="3">Chamada para Projetos de Pesquisa</option>
+            <input type="text" class="form-control" id="nome" name="nome" value="{{ campo.nome }}" required>
+          </div>
+          <!-- Tipo do Campo -->
+          <div class="mb-4">
+            <label for="tipo_campo" class="form-label">
+              <i class="bi bi-list-check"></i>Tipo do Campo<span class="required">*</span>
+            </label>
+            <select class="form-select" id="tipo_campo" name="tipo_campo" required>
+              <option value="">Selecione o tipo</option>
+              {% for tipo in tipos_campo %}
+                <option value="{{ tipo.id }}" {% if campo.tipo.id == tipo.id %}selected{% endif %}>
+                  {{ tipo.nome }} ({{ tipo.get_tipo_dado_display }})
+                </option>
+              {% endfor %}
             </select>
           </div>
-
-          <!-- Date Fields -->
-          <div class="row mb-4">
-            <div class="col-md-6">
-              <label for="data_inicio" class="form-label">
-                <i class="bi bi-calendar"></i>Data de Início<span class="required">*</span>
-              </label>
-              <input type="date" class="form-control" id="data_inicio" value="2025-04-01" required>
-            </div>
-            <div class="col-md-6">
-              <label for="data_fim" class="form-label">
-                <i class="bi bi-calendar"></i>Data de Término<span class="required">*</span>
-              </label>
-              <input type="date" class="form-control" id="data_fim" value="2025-04-30" required>
-            </div>
-          </div>
-
-          <!-- Vacancies Field -->
+          <!-- Peso -->
           <div class="mb-4">
-            <label for="vagas" class="form-label">
-              <i class="bi bi-people"></i>Número de Vagas<span class="required">*</span>
+            <label for="peso" class="form-label">
+              <i class="bi bi-bar-chart"></i>Peso<span class="required">*</span>
             </label>
-            <input type="number" class="form-control" id="vagas" min="1" value="5" required>
+            <input type="number" class="form-control" id="peso" name="peso" min="0" step="0.01" value="{{ campo.peso }}" required>
           </div>
-
-          <!-- Description Field -->
+          <!-- Ordem -->
           <div class="mb-4">
-            <label for="descricao" class="form-label">Descrição da Seleção</label>
-            <textarea class="form-control" id="descricao" rows="4" placeholder="Descreva os detalhes específicos desta seleção...">Seleção específica para a linha de pesquisa em Inteligência Artificial, com foco em Machine Learning e Deep Learning.</textarea>
-          </div>
-
-          <!-- Criteria Field -->
-          <div class="mb-4">
-            <label for="criterios" class="form-label">Critérios de Avaliação</label>
-            <textarea class="form-control" id="criterios" rows="4" placeholder="Descreva os critérios que serão utilizados para avaliar os candidatos...">1. Análise do histórico acadêmico (peso 4)
-2. Avaliação do projeto de pesquisa (peso 4)
-3. Entrevista (peso 2)</textarea>
-          </div>
-
-          <!-- Active Status Field -->
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="ativa" checked>
-            <label class="form-check-label" for="ativa">
-              Seleção Ativa
+            <label for="ordem" class="form-label">
+              <i class="bi bi-list-ol"></i>Ordem<span class="required">*</span>
             </label>
+            <input type="number" class="form-control" id="ordem" name="ordem" min="1" value="{{ campo.ordem }}" required>
+          </div>
+          <!-- Obrigatório -->
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" id="obrigatorio" name="obrigatorio" {% if campo.obrigatorio %}checked{% endif %}>
+            <label class="form-check-label" for="obrigatorio">
+              Campo Obrigatório
+            </label>
+          </div>
+          <!-- Descrição -->
+          <div class="mb-4">
+            <label for="descricao" class="form-label">
+              <i class="bi bi-info-circle"></i>Descrição do Campo
+            </label>
+            <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Descreva o objetivo deste campo...">{{ campo.descricao }}</textarea>
           </div>
         </div>
         <div class="card-footer d-flex justify-content-between">
-          <a href="detalhes-selecao.html" class="btn btn-outline-secondary d-inline-flex align-items-center">
+          <a href="{% url 'gerenciar_campos_fase' campo.fase.id %}" class="btn btn-outline-secondary d-inline-flex align-items-center">
             <i class="bi bi-arrow-left me-2"></i> Cancelar
           </a>
-          <button type="submit" class="btn btn-primary">Atualizar Seleção</button>
+          <button type="submit" class="btn btn-primary">Atualizar Campo</button>
         </div>
       </form>
     </div>
